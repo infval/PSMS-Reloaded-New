@@ -233,46 +233,55 @@ int menu_input(int port, int center_screen) {
  Exit to PS2Browser
  **/
 int Browser_Menu(void) {
-	char *temp;
 	char cnfpath[2048];
 	int i, selection = 0;
 	oldselect = -1;
 	int option_changed = 0;
 
-	int menu_x1 = gsGlobal->Width*0.25;
-	int menu_y1 = gsGlobal->Height*0.25;
-	int menu_x2 = gsGlobal->Width*0.75;
-	int menu_y2 = gsGlobal->Height*0.75+FONT_HEIGHT;
+	int menu_x1 = gsGlobal->Width  * 0.25;
+	int menu_y1 = gsGlobal->Height * 0.25;
+	int menu_x2 = gsGlobal->Width  * 0.75;
+	int menu_y2 = gsGlobal->Height * 0.75 + FONT_HEIGHT;
 	int text_line = menu_y1 + 40;
 
-	char options[11][39] = { { "Display: " }, { "Interlacing: " }, 
-			{ "Center Screen" }, { "Configure Save Path: " }, 
-			{ "" }, { "Configure ELF Path:  " }, { "" }, 
-			{ "Save PSMS.CNF" }, { "Power Off" }, { "Exit to ELF" }, { "Exit Options Menu" }
+	char options[11][39] = {
+		{ "Display: " },
+		{ "Interlacing: " }, 
+		{ "Center Screen" },
+		{ "Configure Save Path: " }, 
+		{ "" },
+		{ "Configure ELF Path:  " },
+		{ "" }, 
+		{ "Save PSMS.CNF" },
+		{ "Power Off" },
+		{ "Exit to ELF" },
+		{ "Exit Options Menu" }
 	};
+	char options_state[11][64] = { { 0 } };
+	char options_buffer[39+64] = { 0 };
 
 	//fill lines with values
 	for (i=0; i<11; i++) {
 		switch (i) {
 		case 0:
 			if (!Settings.display) {
-				sprintf(options[i], "%s%s", options[i], "NTSC");
+				strcpy(options_state[i], "NTSC");
 			} else {
-				sprintf(options[i], "%s%s", options[i], "PAL");
+				strcpy(options_state[i], "PAL");
 			}
 			break;
 		case 1:
 			if (Settings.interlace) {
-				sprintf(options[i], "%s%s", options[i], "On");
+				strcpy(options_state[i], "On");
 			} else {
-				sprintf(options[i], "%s%s", options[i], "Off");
+				strcpy(options_state[i], "Off");
 			}
 			break;
 		case 4:
-			strzncpy(options[4], Settings.savepath, 38);
+			strzncpy(options_state[4], Settings.savepath, 38);
 			break;
 		case 6:
-			strzncpy(options[6], Settings.elfpath, 38);
+			strzncpy(options_state[6], Settings.elfpath, 38);
 			break;
 		}
 	}
@@ -308,13 +317,15 @@ int Browser_Menu(void) {
 					menu_y2);
 
 			for (i=0; i<11; i++) {
+				strcpy(options_buffer, options[i]);
+				strcat(options_buffer, options_state[i]);
 				if (selection == i) {
 					//font_print(gsGlobal, menu_x1+10.0f, text_line + i*FONT_HEIGHT, 2, DarkYellowFont, options[i]);
-					printXY(options[i], menu_x1+10, text_line+i*FONT_HEIGHT, 4,
+					printXY(options_buffer, menu_x1+10, text_line+i*FONT_HEIGHT, 4,
 							FCEUSkin.highlight, 1, 0);
 				} else {
 					//font_print(gsGlobal, menu_x1+10.0f, text_line + i*FONT_HEIGHT, 2, WhiteFont, options[i]);
-					printXY(options[i], menu_x1+10, text_line + i*FONT_HEIGHT,
+					printXY(options_buffer, menu_x1+10, text_line + i*FONT_HEIGHT,
 							4, FCEUSkin.textcolor, 1, 0);
 				}
 			}
@@ -349,16 +360,12 @@ int Browser_Menu(void) {
 					gsGlobal->Mode = GS_MODE_PAL;
 					gsGlobal->Height = 512;
 					snd_sample = SND_RATE / 50;
-					temp = strstr(options[i], "NTSC");
-					*temp = 0;
-					strcat(options[i], "PAL");
+					strcpy(options_state[i], "PAL");
 				} else {
 					gsGlobal->Mode = GS_MODE_NTSC;
 					gsGlobal->Height = 448;
 					snd_sample = SND_RATE / 60;
-					temp = strstr(options[i], "PAL");
-					*temp = 0;
-					strcat(options[i], "NTSC");
+					strcpy(options_state[i], "NTSC");
 				}
 
 				init_custom_screen();
@@ -375,15 +382,11 @@ int Browser_Menu(void) {
 				if (Settings.interlace) {
 					gsGlobal->Interlace = GS_INTERLACED;
 					gsGlobal->Field = GS_FIELD;
-					temp = strstr(options[i], "Off");
-					*temp = 0;
-					strcat(options[i], "On");
+					strcpy(options_state[i], "On");
 				} else {
 					gsGlobal->Interlace = GS_NONINTERLACED;
 					gsGlobal->Field = GS_FRAME;
-					temp = strstr(options[i], "On");
-					*temp = 0;
-					strcat(options[i], "Off");
+					strcpy(options_state[i], "Off");
 				}
 
 				init_custom_screen();
@@ -411,7 +414,7 @@ int Browser_Menu(void) {
 				strcpy(path, "path"); //end reset browser
 				strcpy(Settings.savepath, Browser(0, 1, 0));
 				printf("%s", Settings.savepath);
-				strzncpy(options[4], Settings.savepath, 38);
+				strzncpy(options_state[4], Settings.savepath, 38);
 				selected_dir = 0;
 				h = 0;
 				selection = 0;
@@ -427,7 +430,7 @@ int Browser_Menu(void) {
 				selected = 0;
 				strcpy(path, "path");
 				strcpy(Settings.elfpath, Browser(1, 2, 0));
-				strzncpy(options[6], Settings.elfpath, 38);
+				strzncpy(options_state[6], Settings.elfpath, 38);
 				h = 0;
 				selection = 0;
 				oldselect = -1;
@@ -471,7 +474,6 @@ int Browser_Menu(void) {
 void setupSMSGS(void);
 
 void Ingame_Menu(void) {
-	char *temp;
 	int i, selection = 0;
 	oldselect = -1;
 	char stateoption[16];
@@ -479,34 +481,42 @@ void Ingame_Menu(void) {
 
 	int option_changed = 0;
 
-	int menu_x1 = gsGlobal->Width*0.25;
-	int menu_y1 = gsGlobal->Height*0.25;
-	int menu_x2 = gsGlobal->Width*0.75;
-	int menu_y2 = gsGlobal->Height*0.75+FONT_HEIGHT;
+	int menu_x1 = gsGlobal->Width  * 0.25;
+	int menu_y1 = gsGlobal->Height * 0.25;
+	int menu_x2 = gsGlobal->Width  * 0.75;
+	int menu_y2 = gsGlobal->Height * 0.75 + FONT_HEIGHT;
 
 	int text_line = menu_y1 + 40;
 
-	char options[8][23] = { { "State number: " }, { "Save State" }, 
-			{ "Load State" }, { "Filtering: " }, { "Region: " }, 
-			{ "Reset Game" },
-			{ "Exit Game" }, { "Exit Menu" } };
+	char options[8][23] = {
+		{ "State number: " },
+		{ "Save State" },
+		{ "Load State" },
+		{ "Filtering: " },
+		{ "Region: " },
+		{ "Reset Game" },
+		{ "Exit Menu" },
+		{ "Exit Game" }
+	};
+	char options_state[8][32] = { { 0 } };
+	char options_buffer[23+32] = { 0 };
 
 	for (i=0; i<8; i++) {
 		switch (i) {
 		case 0:
-			sprintf(options[i], "%s%d", options[i], statenum);
+			sprintf(options_state[i], "%d", statenum);
 			break;
 		case 3:
 			if (!Settings.filter)
-				sprintf(options[i], "%s%s", options[i], "Off");
+				strcpy(options_state[i], "Off");
 			else
-				sprintf(options[i], "%s%s", options[i], "On");
+				strcpy(options_state[i], "On");
 			break;
 		case 4:
 			if (sms.country == TYPE_OVERSEAS)
-				sprintf(options[i], "%s%s", options[i], "US/EUR");
+				strcpy(options_state[i], "US/EUR");
 			else
-				sprintf(options[i], "%s%s", options[i], "Japan");
+				strcpy(options_state[i], "Japan");
 			break;
 		}
 	}
@@ -537,13 +547,15 @@ void Ingame_Menu(void) {
 					menu_y2);
 
 			for (i=0; i<8; i++) {
+				strcpy(options_buffer, options[i]);
+				strcat(options_buffer, options_state[i]);
 				if (selection == i) {
 					//font_print(gsGlobal, menu_x1+10.0f, text_line + i*FONT_HEIGHT, 2, DarkYellowFont, options[i]);
-					printXY(options[i], menu_x1+10, text_line + i*FONT_HEIGHT,
+					printXY(options_buffer, menu_x1+10, text_line + i*FONT_HEIGHT,
 							4, FCEUSkin.highlight, 1, 0);
 				} else {
 					//font_print(gsGlobal, menu_x1+10.0f, text_line + i*FONT_HEIGHT, 2, WhiteFont, options[i]);
-					printXY(options[i], menu_x1+10, text_line + i*FONT_HEIGHT,
+					printXY(options_buffer, menu_x1+10, text_line + i*FONT_HEIGHT,
 							4, FCEUSkin.textcolor, 1, 0);
 				}
 			}
@@ -555,16 +567,16 @@ void Ingame_Menu(void) {
 
 		if (selected) {
 			if (selected == 2) { //menu combo pressed again
-				selection = 7;
+				selection = 6;
 			}
 			i = selection;
 			switch (i) {
 			case 0: //State Number
 				statenum++;
-				if (statenum > 9) {
+				if (statenum >= 10) {
 					statenum = 0;
 				}
-				sprintf(options[i], "%s%d", stateoption, statenum);
+				sprintf(options_state[i], "%d", statenum);
 				//FCEUI_SelectState(statenum);
 				option_changed = 1;
 				break;
@@ -579,44 +591,36 @@ void Ingame_Menu(void) {
 			case 3:
 				Settings.filter ^= 1;
 				if (Settings.filter) {
-					temp = strstr(options[i], "Off");
-					*temp = 0;
-					strcat(options[i], "On");
+					strcpy(options_state[i], "On");
 				} else {
-					temp = strstr(options[i], "On");
-					*temp = 0;
-					strcat(options[i], "Off");
+					strcpy(options_state[i], "Off");
 				}
 				option_changed = 1;
 				break;
 			case 4:
 				sms.country ^= 1;
 				if (sms.country == TYPE_OVERSEAS) {
-					temp = strstr(options[i], "Japan");
-					*temp = 0;
-					strcat(options[i], "US/EUR");
+					strcpy(options_state[i], "US/EUR");
 				} else {
-					temp = strstr(options[i], "US/EUR");
-					*temp = 0;
-					strcat(options[i], "Japan ");
+					strcpy(options_state[i], "Japan");
 				}
 				option_changed = 1;
 				break;
 			case 5:
 				system_reset();
-		  		if(sound) {
+				if(sound) {
 					SjPCM_Clearbuff();
 					SjPCM_Play();
 				}
-		  		setupSMSGS();
+				setupSMSGS();
 				return;
 			case 6:
+				setupSMSGS();
+				return;
+			case 7:
 				statenum = 0;
 				endflag = 1;
 				selected = 0;
-				return;
-			case 7:
-				setupSMSGS();
 				return;
 			}
 		}

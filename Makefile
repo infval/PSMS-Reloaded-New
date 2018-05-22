@@ -8,11 +8,11 @@
 #
 
 EE_BIN = psms.elf
-EE_OBJS = sjpcm_rpc.o psms.o fmopl.o render.o sms.o sn76496.o system.o vdp.o ym2413.o z80.o browser/browser.o browser/cd.o browser/bdraw.o browser/font_uLE.o browser/init.o browser/pad.o browser/ps2font.o browser/cnfsettings.o browser/menu.o browser/Reboot_ELF.o irx/iomanX_irx.o irx/fileXio_irx.o irx/ps2dev9_irx.o irx/ps2atad_irx.o irx/ps2hdd_irx.o irx/ps2fs_irx.o irx/poweroff_irx.o irx/usbd_irx.o irx/cdvd_irx.o irx/usbhdfsd_irx.o irx/sjpcm_irx.o 
-EE_CFLAGS  += -DALIGN_DWORD -DLSB_FIRST  
+EE_OBJS = sjpcm_rpc.o psms.o fmopl.o render.o sms.o sn76496.o system.o vdp.o ym2413.o z80.o browser/browser.o browser/cd.o browser/bdraw.o browser/font_uLE.o browser/init.o browser/pad.o browser/ps2font.o browser/cnfsettings.o browser/menu.o browser/Reboot_ELF.o irx/iomanX_irx.o irx/fileXio_irx.o irx/ps2dev9_irx.o irx/ps2atad_irx.o irx/ps2hdd_irx.o irx/ps2fs_irx.o irx/poweroff_irx.o irx/usbd_irx.o irx/cdvd_irx.o irx/usbhdfsd_irx.o irx/sjpcm_irx.o
+EE_CFLAGS  += -DALIGN_DWORD -DLSB_FIRST
 EE_LDFLAGS += -L$(PS2DEV)/gskit/lib -L$(PS2DEV)/ps2sdk/ports/lib -s
 EE_LIBS += -lgskit -ldmakit -ljpeg -lpng -lz -lm -lfileXio -lhdd -lmc -lpadx -lpoweroff -lpatches -ldebug
-EE_INCS += -I. -I./cpu -I./browser 
+EE_INCS += -I. -I./browser
 EE_INCS += -I$(PS2SDK)/sbv/include -I$(PS2SDK)/ports/include -I$(PS2DEV)/gsKit/include
 
 EE_INCS += -Ilibcdvd/ee
@@ -21,10 +21,13 @@ EE_LIBS += -lcdvdfs
 
 IRX_DIR=$(PS2SDK)/iop/irx
 
+EE_PACKED_BIN = psms-packed.elf
+
 #.SUFFIXES: .c .s .cc .dsm
 
 all: $(EE_BIN)
-	ee-strip $(EE_BIN)
+	$(EE_STRIP) $(EE_BIN)
+	ps2-packer $(EE_BIN) $(EE_PACKED_BIN)
 
 ./irx/iomanX_irx.c:
 	bin2c $(IRX_DIR)/iomanX.irx ./irx/iomanX_irx.c iomanX_irx
@@ -61,7 +64,7 @@ all: $(EE_BIN)
 	
 
 clean:
-	rm -f *.elf *.o *.a *.s browser/*.o ./irx/*.c ./irx/*.o
+	rm -f $(EE_BIN) $(EE_PACKED_BIN) $(EE_OBJS) ./irx/*.c
 
 run: $(EE_BIN)
 	ps2client execee host:$(EE_BIN)
