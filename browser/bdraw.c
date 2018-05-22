@@ -96,15 +96,15 @@ void browser_primitive(char *title1, char *title2, GSTEXTURE *gsTexture,
 void normalize_screen(void) {
 	GS_SET_DISPLAY1(gsGlobal->StartX, // X position in the display area (in VCK unit
 			gsGlobal->StartY, // Y position in the display area (in Raster u
-			gsGlobal->MagX, // Horizontal Magnification
-			gsGlobal->MagY, // Vertical Magnification
+			gsGlobal->MagH, // Horizontal Magnification
+			gsGlobal->MagV, // Vertical Magnification
 			(gsGlobal->Width * 4) -1, // Display area width
 			(gsGlobal->Height-1)); // Display area height
 
 	GS_SET_DISPLAY2(gsGlobal->StartX, // X position in the display area (in VCK units)
 			gsGlobal->StartY, // Y position in the display area (in Raster units)
-			gsGlobal->MagX, // Horizontal Magnification
-			gsGlobal->MagY, // Vertical Magnification
+			gsGlobal->MagH, // Horizontal Magnification
+			gsGlobal->MagV, // Vertical Magnification
 			(gsGlobal->Width * 4) -1, // Display area width
 			(gsGlobal->Height-1)); // Display area height
 }
@@ -137,16 +137,20 @@ void init_custom_screen(void) {
 
 	normalize_screen();
 
-	SetGsCrt(gsGlobal->Interlace, gsGlobal->Mode, gsGlobal->Field);
+	//SetGsCrt(gsGlobal->Interlace, gsGlobal->Mode, gsGlobal->Field);
+	gsKit_init_screen(gsGlobal);
+	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 }
 
 
 void SetupGSKit(void) {
 	/* detect and set screentype */
+	if (gsGlobal != NULL) gsKit_deinit_global(gsGlobal);
+	gsGlobal = gsKit_init_global();
 	//gsGlobal = gsKit_init_global(GS_MODE_PAL);
-	gsGlobal = gsKit_init_global_custom(GS_MODE_PAL,
-			GS_RENDER_QUEUE_OS_POOLSIZE+GS_RENDER_QUEUE_OS_POOLSIZE/2,
-			GS_RENDER_QUEUE_PER_POOLSIZE+GS_RENDER_QUEUE_PER_POOLSIZE/2);
+	//gsGlobal = gsKit_init_global_custom(GS_MODE_PAL,
+	//		GS_RENDER_QUEUE_OS_POOLSIZE+GS_RENDER_QUEUE_OS_POOLSIZE/2,
+	//		GS_RENDER_QUEUE_PER_POOLSIZE+GS_RENDER_QUEUE_PER_POOLSIZE/2);
 	gsGlobal->Height = 512;
 
 	defaultx = gsGlobal->StartX;

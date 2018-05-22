@@ -6,3 +6,6 @@
 
 # Libraries
 *.a
+
+# Generated
+/irx/*.c

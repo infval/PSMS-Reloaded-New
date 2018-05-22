@@ -385,7 +385,9 @@ int Browser_Menu(void) {
 				menu_y2 = gsGlobal->Height*0.75+FONT_HEIGHT;
 				text_line = menu_y1 + 40;
 				option_changed = 1;
-				SetGsCrt(gsGlobal->Interlace, gsGlobal->Mode, gsGlobal->Field);
+				//SetGsCrt(gsGlobal->Interlace, gsGlobal->Mode, gsGlobal->Field);
+				gsKit_init_screen(gsGlobal);
+				gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 				break;
 			case 1: //Interlacing Off/On
 				Settings.interlace ^= 1;
@@ -406,7 +408,9 @@ int Browser_Menu(void) {
 				}
 				normalize_screen();
 				option_changed = 1;
-				SetGsCrt(gsGlobal->Interlace, gsGlobal->Mode, gsGlobal->Field);
+				//SetGsCrt(gsGlobal->Interlace, gsGlobal->Mode, gsGlobal->Field);
+				gsKit_init_screen(gsGlobal);
+				gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 				break;
 			case 2: //Center Screen
 				while (menu_input(0, 2) != 2) {

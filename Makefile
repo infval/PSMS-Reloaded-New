@@ -8,54 +8,60 @@
 #
 
 EE_BIN = psms.elf
-EE_OBJS = sjpcm_rpc.o psms.o fmopl.o render.o sms.o sn76496.o system.o vdp.o ym2413.o z80.o sjpcm_irx.o browser/browser.o browser/cd.o browser/bdraw.o browser/font_uLE.o browser/init.o browser/pad.o browser/ps2font.o browser/cnfsettings.o browser/menu.o browser/Reboot_ELF.o iomanX_irx.o fileXio_irx.o ps2dev9_irx.o ps2atad_irx.o ps2hdd_irx.o ps2fs_irx.o poweroff_irx.o usbd_irx.o cdvd_irx.o usbhdfsd_irx.o 
+EE_OBJS = sjpcm_rpc.o psms.o fmopl.o render.o sms.o sn76496.o system.o vdp.o ym2413.o z80.o browser/browser.o browser/cd.o browser/bdraw.o browser/font_uLE.o browser/init.o browser/pad.o browser/ps2font.o browser/cnfsettings.o browser/menu.o browser/Reboot_ELF.o irx/iomanX_irx.o irx/fileXio_irx.o irx/ps2dev9_irx.o irx/ps2atad_irx.o irx/ps2hdd_irx.o irx/ps2fs_irx.o irx/poweroff_irx.o irx/usbd_irx.o irx/cdvd_irx.o irx/usbhdfsd_irx.o irx/sjpcm_irx.o 
 EE_CFLAGS  += -DALIGN_DWORD -DLSB_FIRST  
 EE_LDFLAGS += -L$(PS2DEV)/gskit/lib -L$(PS2DEV)/ps2sdk/ports/lib -s
-EE_LIBS += -lgskit -ldmakit -ljpg -lpng -lz -lm -lfileXio -lhdd -lmc -lpadx -lpoweroff -lpatches -ldebug -lcdvdfs
+EE_LIBS += -lgskit -ldmakit -ljpeg -lpng -lz -lm -lfileXio -lhdd -lmc -lpadx -lpoweroff -lpatches -ldebug
 EE_INCS += -I. -I./cpu -I./browser 
 EE_INCS += -I$(PS2SDK)/sbv/include -I$(PS2SDK)/ports/include -I$(PS2DEV)/gsKit/include
+
+EE_INCS += -Ilibcdvd/ee
+EE_LDFLAGS += -Llibcdvd/lib
+EE_LIBS += -lcdvdfs
+
+IRX_DIR=$(PS2SDK)/iop/irx
 
 #.SUFFIXES: .c .s .cc .dsm
 
 all: $(EE_BIN)
 	ee-strip $(EE_BIN)
 
-iomanX_irx.s:
-	bin2s $(PS2SDK)/iop/irx/iomanX.irx iomanX_irx.s iomanX_irx
+./irx/iomanX_irx.c:
+	bin2c $(IRX_DIR)/iomanX.irx ./irx/iomanX_irx.c iomanX_irx
 
-fileXio_irx.s:
-	bin2s $(PS2SDK)/iop/irx/fileXio.irx fileXio_irx.s fileXio_irx
+./irx/fileXio_irx.c:
+	bin2c $(IRX_DIR)/fileXio.irx ./irx/fileXio_irx.c fileXio_irx
 
-ps2dev9_irx.s:
-	bin2s $(PS2SDK)/iop/irx/ps2dev9.irx ps2dev9_irx.s ps2dev9_irx
+./irx/ps2dev9_irx.c:
+	bin2c $(IRX_DIR)/ps2dev9.irx ./irx/ps2dev9_irx.c ps2dev9_irx
 
-ps2atad_irx.s:
-	bin2s $(PS2SDK)/iop/irx/ps2atad.irx ps2atad_irx.s ps2atad_irx
+./irx/ps2atad_irx.c:
+	bin2c $(IRX_DIR)/ps2atad.irx ./irx/ps2atad_irx.c ps2atad_irx
 
-ps2hdd_irx.s:
-	bin2s $(PS2SDK)/iop/irx/ps2hdd.irx ps2hdd_irx.s ps2hdd_irx
+./irx/ps2hdd_irx.c:
+	bin2c $(IRX_DIR)/ps2hdd.irx ./irx/ps2hdd_irx.c ps2hdd_irx
 
-ps2fs_irx.s:
-	bin2s $(PS2SDK)/iop/irx/ps2fs.irx ps2fs_irx.s ps2fs_irx
+./irx/ps2fs_irx.c:
+	bin2c $(IRX_DIR)/ps2fs.irx ./irx/ps2fs_irx.c ps2fs_irx
 
-poweroff_irx.s:
-	bin2s $(PS2SDK)/iop/irx/poweroff.irx poweroff_irx.s poweroff_irx
+./irx/poweroff_irx.c:
+	bin2c $(IRX_DIR)/poweroff.irx ./irx/poweroff_irx.c poweroff_irx
 
-usbd_irx.s:
-	bin2s $(PS2SDK)/iop/irx/usbd.irx usbd_irx.s usbd_irx
+./irx/usbd_irx.c:
+	bin2c $(IRX_DIR)/usbd.irx ./irx/usbd_irx.c usbd_irx
 
-usbhdfsd_irx.s:
-	bin2s $(PS2SDK)/iop/irx/usbhdfsd.irx usbhdfsd_irx.s usbhdfsd_irx
+./irx/usbhdfsd_irx.c:
+	bin2c $(IRX_DIR)/usbhdfsd.irx ./irx/usbhdfsd_irx.c usbhdfsd_irx
 
-cdvd_irx.s:
-	bin2s $(PS2SDK)/iop/irx/cdvd.irx cdvd_irx.s cdvd_irx
+./irx/cdvd_irx.c:
+	bin2c cdvd.irx ./irx/cdvd_irx.c cdvd_irx
 	
-sjpcm_irx.s:
-	bin2s sjpcm.irx sjpcm_irx.s sjpcm_irx
+./irx/sjpcm_irx.c:
+	bin2c sjpcm.irx ./irx/sjpcm_irx.c sjpcm_irx
 	
 
 clean:
-	rm -f *.elf *.o *.a *.s browser/*.o
+	rm -f *.elf *.o *.a *.s browser/*.o ./irx/*.c ./irx/*.o
 
 run: $(EE_BIN)
 	ps2client execee host:$(EE_BIN)
