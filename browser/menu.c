@@ -488,20 +488,21 @@ void Ingame_Menu(void) {
 
 	int text_line = menu_y1 + 40;
 
-	char options[8][23] = {
+	char options[9][23] = {
 		{ "State number: " },
 		{ "Save State" },
 		{ "Load State" },
 		{ "Filtering: " },
+		{ "Sprite Limit: " },
 		{ "Region: " },
 		{ "Reset Game" },
 		{ "Exit Menu" },
 		{ "Exit Game" }
 	};
-	char options_state[8][32] = { { 0 } };
+	char options_state[9][32] = { { 0 } };
 	char options_buffer[23+32] = { 0 };
 
-	for (i=0; i<8; i++) {
+	for (i=0; i<9; i++) {
 		switch (i) {
 		case 0:
 			sprintf(options_state[i], "%d", statenum);
@@ -513,6 +514,12 @@ void Ingame_Menu(void) {
 				strcpy(options_state[i], "On");
 			break;
 		case 4:
+			if (vdp.limit)
+				strcpy(options_state[i], "On");
+			else
+				strcpy(options_state[i], "Off");
+			break;
+		case 5:
 			if (sms.country == TYPE_OVERSEAS)
 				strcpy(options_state[i], "US/EUR");
 			else
@@ -528,11 +535,11 @@ void Ingame_Menu(void) {
 		selected = 0; //clear selected flag
 		selection += menu_input(0, 0);
 
-		if (selection > 7) {
+		if (selection >= 9) {
 			selection = 0;
 		}
 		if (selection < 0) {
-			selection = 7;
+			selection = 8;
 		}
 
 		if (oldselect != selection || option_changed) {
@@ -546,7 +553,7 @@ void Ingame_Menu(void) {
 			menu_primitive("Options", &MENU_TEX, menu_x1, menu_y1, menu_x2,
 					menu_y2);
 
-			for (i=0; i<8; i++) {
+			for (i=0; i<9; i++) {
 				strcpy(options_buffer, options[i]);
 				strcat(options_buffer, options_state[i]);
 				if (selection == i) {
@@ -567,7 +574,7 @@ void Ingame_Menu(void) {
 
 		if (selected) {
 			if (selected == 2) { //menu combo pressed again
-				selection = 6;
+				selection = 7;
 			}
 			i = selection;
 			switch (i) {
@@ -598,6 +605,14 @@ void Ingame_Menu(void) {
 				option_changed = 1;
 				break;
 			case 4:
+				vdp.limit ^= 1;
+				if (vdp.limit)
+					strcpy(options_state[i], "On");
+				else
+					strcpy(options_state[i], "Off");
+				option_changed = 1;
+				break;
+			case 5:
 				sms.country ^= 1;
 				if (sms.country == TYPE_OVERSEAS) {
 					strcpy(options_state[i], "US/EUR");
@@ -606,7 +621,7 @@ void Ingame_Menu(void) {
 				}
 				option_changed = 1;
 				break;
-			case 5:
+			case 6:
 				system_reset();
 				if(sound) {
 					SjPCM_Clearbuff();
@@ -614,10 +629,10 @@ void Ingame_Menu(void) {
 				}
 				setupSMSGS();
 				return;
-			case 6:
+			case 7:
 				setupSMSGS();
 				return;
-			case 7:
+			case 8:
 				statenum = 0;
 				endflag = 1;
 				selected = 0;

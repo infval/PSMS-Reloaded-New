@@ -12,7 +12,7 @@ EE_OBJS = sjpcm_rpc.o psms.o fmopl.o render.o sms.o sn76496.o system.o vdp.o ym2
 EE_CFLAGS  += -DALIGN_DWORD -DLSB_FIRST
 EE_LDFLAGS += -L$(PS2DEV)/gskit/lib -L$(PS2DEV)/ps2sdk/ports/lib -s
 EE_LIBS += -lgskit -ldmakit -ljpeg -lpng -lz -lm -lfileXio -lhdd -lmc -lpadx -lpoweroff -lpatches -ldebug
-EE_INCS += -I. -I./browser
+EE_INCS += -I./browser # -I.
 EE_INCS += -I$(PS2SDK)/sbv/include -I$(PS2SDK)/ports/include -I$(PS2DEV)/gsKit/include
 
 EE_INCS += -Ilibcdvd/ee

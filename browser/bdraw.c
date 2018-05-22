@@ -15,6 +15,7 @@ extern u8 bgtex;
 static int VCK;
 
 int FONT_HEIGHT = 16;
+int FONT_WIDTH = 8;
 
 void menu_bgtexture(GSTEXTURE *gsTexture, float x1, float y1, float x2,
 		float y2, int z) {
