@@ -1,0 +1,52 @@
+#
+# PSMS
+# Copyright (C) 2002  Nick Van Veen
+#
+
+LIBDIR      = $(PS2LIB)/ee/lib
+INCLUDES    = -I$(PS2LIB)/common/include -I$(PS2LIB)/ee/include -I. -I./cpu -I./gfxpipe
+
+OBJS        = sjpcm_rpc.o psms.o menu.o pad.o gs.o hw.o fmopl.o render.o sms.o sn76496.o system.o vdp.o ym2413.o z80.o psms_logo.o font/vixar.o gfxpipe/gfxpipe.o
+
+LCFILE      = linkfile
+
+LIBS        = -lm -lkernel -lc
+
+PREFIX      = ee
+AS          = $(PREFIX)-gcc
+CC          = $(PREFIX)-gcc
+CPP         = cpp
+LD          = $(PREFIX)-gcc
+DVPASM      = $(PREFIX)-dvp-as
+OBJDUMP     = $(PREFIX)-objdump
+RM          = /bin/rm -f
+
+CFLAGS      = -O2 -EL -pipe -Wall -Wa,-al -D_EE -DLSB_FIRST -DALIGN_DWORD -fomit-frame-pointer -fno-common -mips3 -mcpu=r5900 -ffreestanding -fno-builtin -fshort-double -nostartfiles -mlong64 -mhard-float -mno-abicalls -c
+CXXFLAGS    = -O2 -Wall -Wa,-al -fno-exceptions -fno-common
+LDFLAGS     = -Wl,-Map,psms.map -L$(LIBDIR) -L.
+
+.SUFFIXES: .c .s .cc .dsm
+
+all: psms.elf
+
+psms.elf: $(OBJS)
+	$(LD) -o $@ -T $(LCFILE) $(OBJS) $(LDFLAGS) $(LIBS)
+	ee-strip -F elf32-littlemips psms.elf
+
+crt0.o:
+	$(AS) $(CFLAGS) crt0.s -o $@ > $*.lst
+
+.s.o:
+	$(AS) $(CFLAGS) $(INCLUDES) $< -o $@ > $*.lst
+
+.S.o:
+	$(AS) $(CFLAGS) $(INCLUDES) $< -o $@ > $*.lst
+
+.c.o:
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $*.o > $*.lst
+
+.cc.o:
+	$(CC) $(CXXFLAGS) $(INCLUDES) -c $< -o $*.o > $*.lst
+
+clean:
+	$(RM) *.o *.map *.lst core *.dis *.elf

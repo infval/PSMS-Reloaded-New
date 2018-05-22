@@ -1,0 +1,71 @@
+CD Creation
+-----------
+
+When PSMS boots, its looks for a file in the root directory of
+the cd called "FILES.TXT". This file contains a list of all the
+roms on the cd, and the actual game names for each of the roms.
+In order for PSMS to work correctly, FILES.TXT must be made
+correctly - dont expect PSMS to work right if you mess something
+up. You have two choices when it comes to making your FILES.TXT
+file: You can use a nice GUI app coded by Justice, or you can
+create it manually. If you want to use the GUI app, download
+from http://psms.gamebase.ca and follow the instructions
+included in the archive. If you want to create your FILES.TXT
+manually, follow the instructions below.
+
+----------------------------------------------------------------
+
+1) Organise the intended directory tree of the CD on your hard disk.
+   The CD must conform to the ISO9660 standard. This imposes several
+   limitations on how you can create your cd. All filenames and
+   directory names may consist ONLY of the following characters:
+
+   A-Z (in upper case!!), 0-9, '_'
+
+   Filenames must be in 8.3 format - ########.### (ALEXKIDD.SMS
+   or SONIC.GG are valid 8.3 filenames). You may not have more
+   than 30 files per directory, so if you have more than 30 roms
+   you must span them accross several directories (ie, ROMS1\
+   ROMS2\ ROMS3\ - each of these dirs can hold up to 30 roms).
+
+   Once you have the roms in the sorted out, place PSMS.ELF, SJPCM.IRX
+   and SYSTEM.CNF so they will end up in the root directory of your CD.
+
+2) Create the "FILES.TXT" file. This file accociates actual game
+   names with filenames. You must use the full filenames realative
+   to the root directory of the CD (ie, ROMS1\ALEXKIDD.SMS). The
+   text file is set out as follows:
+
+   Alex the Kidd,ROMS1\ALEXKIDD.SMS
+   Asterix,ROMS2\ASTERIX.SMS
+   California Games,ROMS3\CALIFGAM.SMS
+
+   ... and so on.
+
+   There must be a comma in-between the game name and filename.
+   Make sure you press enter after the last entry (there must be a
+   newline character after the last entry).
+
+   There is currently a "bug" in the file reading code that PSMS
+   uses - it can only read 16 bytes from a file at a time. If your
+   file is NOT a multiple of 16 bytes, the last few characters will
+   not be read. To fix this, pad the end of the file with spaces
+   until it is a multiple of 16 byes.
+
+3) Create a MODE 2 ISO with PSMS.ELF, SJPCM.IRX, FILES.TXT and
+   SYSTEM.CNF in the root directory. Place the roms where you have
+   specified in FILES.TXT (ie, if your FILES.TXT is set up like the
+   example in step 2, place ROMS1\ ROMS2\ ROMS3\ in the root dir of
+   your ISO). Make sure your CD writing software creates and burns
+   the ISO with the correct settings. These are:
+
+   - ISO9660 level 1 filesystem
+   - ISO9660 character set
+   - Joliet DISABLED
+   - ISO9660 relaxations DISABLED
+
+   You may also need to patch your image, depending on your booting
+   method (some versions of AR/GS require SYSTEM.CNF to be at a
+   certain location on the CD).
+
+   Burn your ISO, and if you have set it up properly, ENJOY!

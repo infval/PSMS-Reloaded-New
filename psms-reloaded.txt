@@ -1,0 +1,30 @@
+PSMS - Reloaded 
+by: bootsector (bootsector@ig.com.br)
+http://www.brunofreitas.com/
+-------------------------------------
+
+PSMS Reloaded attempts to bring PSMS 1.2 (by Sjeep) back to life! It now
+supports following devices, without relying on any special "FILES.TXT" index:
+
+:. Memory Card
+:. USB Devices
+:. CD/DVD
+:. HDD
+
+This version was converted from PS2LIB/GFXPIPE to PS2SDK/GsKit by bootsector.
+
+Thanks to the following people who (in)directly made this happen:
+
+:. PS2SDK maintainers/developers
+:. PS2DEV forum members (Lukasz and others)
+:. ragnarok2040 for his menu component (used in FCEUltra for PS2)
+:. dlanor and EP for LaunchElf and its source code
+:. Sjeep for the quick and dirty, but still good PSMS port.
+:. My lovely wife, Miriam, for letting me to spend some of our 
+   valuable time with this ;)
+   
+This is a WIP project. There are still many features to be added!
+
+Hope you folks enjoy it!
+
+bootsector

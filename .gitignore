@@ -1,0 +1,8 @@
+# Full https://github.com/github/gitignore/blob/master/C.gitignore
+
+# Object files
+*.o
+*.elf
+
+# Libraries
+*.a

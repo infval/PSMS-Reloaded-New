@@ -1,0 +1,62 @@
+Notes about PSMS source:
+------------------------
+
+PSMS is a port of SMSPlus, the excellent SMS emulator by Charles
+Mac Donald. SMSPlus source code is distributed under the terms of
+the GNU General Public License. Since PSMS is a derivative of SMSPlus,
+PSMS source code is also distributed under the terms of the GNU
+General Public License.
+
+NOTE: PSMS uses other general-purpose free software modules which
+      are NOT distributed under the terms of the GNU General Public
+      License. These modules include:
+
+      - Gfxpipe, by Vzzrzzn
+      - ps2lib, by Gustavo Scotti and many others.
+
+-------------------------------------------------------------------
+
+To compile, you will need an up-to-date cvs version of ps2lib and
+the ee toolchain (ee-gcc & ee-binutils).
+
+WARNING: The PS2 specific code is messy and un-optimised. My goal
+was not to produce efficent and easy to read code, just to produce
+working code.
+
+I hope people will learn from my code. Its a good example of how to
+quickly and easily port an emulator to the ps2, so hopefully people
+will learn from this example and start porting other emulators.
+
+Note that a few minor bugs have been discovered in PSMS, but I havent
+had time to fix them so they are still present in this source code.
+The *known* bugs are:
+1) Rom filenames are not turned into capitals, which can cause problems
+   if FILES.TXT has not been created properly.
+2) The pad init code is badly designed, and it will cause the program to
+   halt until one of the following conditions are met: a) No controller
+   is inserted in port 1, or b) a dual-shock controller is insterted in
+   port 1.
+
+SjPCM is considered to be a seperate program from PSMS. SjPCM ee-side
+source code is distributed under the terms of the GNU General Public
+License. IOP-side code will be released once I clean the src.
+
+Please contact me if you have any questions about the source code, or
+if you use parts of the source code in a project.
+
+- Sjeep
+
+-------------------------------------------------------------------
+
+Legal
+-----
+
+The PSMS source code is distributed under the terms of the GNU General
+Public License.
+
+The Z80 CPU emulator, SN76489 and YM3812 sound chip emulation, and SEAL
+interface code are taken from the MAME project, and terms of their use
+are covered under the MAME license. (http://www.mame.net)
+
+The YM2413 instrument parameter table is also taken from MAME.
+
