@@ -4,14 +4,15 @@
 #include "browser.h"
 #include "ps2font.h"
 
+#include "browser/bdraw.h"
+
 extern skin FCEUSkin;
 extern vars Settings;
 extern GSGLOBAL *gsGlobal;
 extern u8 menutex;
 extern u8 bgtex;
 
-int defaultx;
-int defaulty;
+static int VCK;
 
 int FONT_HEIGHT = 16;
 
@@ -93,52 +94,27 @@ void browser_primitive(char *title1, char *title2, GSTEXTURE *gsTexture,
 
 
 
-void normalize_screen(void) {
-	GS_SET_DISPLAY1(gsGlobal->StartX, // X position in the display area (in VCK unit
-			gsGlobal->StartY, // Y position in the display area (in Raster u
-			gsGlobal->MagH, // Horizontal Magnification
-			gsGlobal->MagV, // Vertical Magnification
-			(gsGlobal->Width * 4) -1, // Display area width
-			(gsGlobal->Height-1)); // Display area height
-
-	GS_SET_DISPLAY2(gsGlobal->StartX, // X position in the display area (in VCK units)
-			gsGlobal->StartY, // Y position in the display area (in Raster units)
-			gsGlobal->MagH, // Horizontal Magnification
-			gsGlobal->MagV, // Vertical Magnification
-			(gsGlobal->Width * 4) -1, // Display area width
-			(gsGlobal->Height-1)); // Display area height
-}
-
 void init_custom_screen(void) {
 	
 	if (Settings.display) {
 		gsGlobal->Mode = GS_MODE_PAL;
 		gsGlobal->Height = 512;
-		defaulty = 72;
+		VCK = 4;
 	} else {
 		gsGlobal->Mode = GS_MODE_NTSC;
-		gsGlobal->Height = 448; // 448;
-		defaulty = 40;
+		gsGlobal->Height = 448;
+		VCK = 4;
 	}
-	
-	gsGlobal->StartY = defaulty + Settings.offset_y;
-	gsGlobal->StartX = defaultx + Settings.offset_x;
 
-	if(Settings.interlace)
-		gsGlobal->StartY = gsGlobal->StartY + 22;
-	else
-		gsGlobal->StartY = gsGlobal->StartY + 11;
-
-	if(!Settings.interlace) {
+	if (!Settings.interlace) {
 		gsGlobal->Interlace = GS_NONINTERLACED;
 		gsGlobal->Field = GS_FRAME;
-		gsGlobal->StartY = gsGlobal->StartY/2 + 1;
+		VCK = 2;
 	}
 
-	normalize_screen();
-
-	//SetGsCrt(gsGlobal->Interlace, gsGlobal->Mode, gsGlobal->Field);
+	gsKit_vram_clear(gsGlobal);
 	gsKit_init_screen(gsGlobal);
+	SetDisplayOffset();
 	gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 }
 
@@ -147,14 +123,6 @@ void SetupGSKit(void) {
 	/* detect and set screentype */
 	if (gsGlobal != NULL) gsKit_deinit_global(gsGlobal);
 	gsGlobal = gsKit_init_global();
-	//gsGlobal = gsKit_init_global(GS_MODE_PAL);
-	//gsGlobal = gsKit_init_global_custom(GS_MODE_PAL,
-	//		GS_RENDER_QUEUE_OS_POOLSIZE+GS_RENDER_QUEUE_OS_POOLSIZE/2,
-	//		GS_RENDER_QUEUE_PER_POOLSIZE+GS_RENDER_QUEUE_PER_POOLSIZE/2);
-	gsGlobal->Height = 512;
-
-	defaultx = gsGlobal->StartX;
-	defaulty = gsGlobal->StartY;
 
 	/* initialize dmaKit */
 	//dmaKit_init(D_CTRL_RELE_OFF,D_CTRL_MFD_OFF, D_CTRL_STS_UNSPEC, D_CTRL_STD_OFF, D_CTRL_RCYC_8);
@@ -166,11 +134,13 @@ void SetupGSKit(void) {
 	dmaKit_chan_init(DMA_CHANNEL_TOSPR);
 
 	gsGlobal->DoubleBuffering = GS_SETTING_OFF;
-	gsGlobal->ZBuffering = GS_SETTING_OFF;
+	gsGlobal->ZBuffering      = GS_SETTING_OFF;
 
 	//640x448, ntsc, tv
 	//640x512, pal, tv
-	gsGlobal->Width = 640;
-
 }
 
+void SetDisplayOffset(void)
+{
+	gsKit_set_display_offset(gsGlobal, Settings.offset_x * VCK, Settings.offset_y);
+}

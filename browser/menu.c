@@ -19,8 +19,6 @@
 
 //Settings
 extern vars Settings;
-extern int defaultx;
-extern int defaulty;
 //Skin
 extern skin FCEUSkin;
 extern u8 menutex;
@@ -41,7 +39,6 @@ u8 power_off = 0;
 /* gsKit Variables                  */
 /************************************/
 extern GSGLOBAL *gsGlobal;
-//extern GSFONT *gsFont;
 extern GSTEXTURE BG_TEX;
 extern GSTEXTURE MENU_TEX;
 
@@ -213,15 +210,11 @@ int menu_input(int port, int center_screen) {
 		}
 	}
 	if ((center_screen && change) || (center_screen == 2)) {
-		gsGlobal->StartX = defaultx + Settings.offset_x;
-		gsGlobal->StartY = defaulty + Settings.offset_y;
-
-		normalize_screen();
+		SetDisplayOffset();
 
 		gsKit_clear(gsGlobal, GS_SETREG_RGBAQ(0x00,0x00,0x00,0x80,0x00));
 
-		menu_primitive("Centering", &BG_TEX, 0, 0, gsGlobal->Width,
-				gsGlobal->Height);
+		menu_primitive("Centering", &BG_TEX, 0, 0, gsGlobal->Width, gsGlobal->Height);
 
 		DrawScreen(gsGlobal);
 
@@ -355,62 +348,52 @@ int Browser_Menu(void) {
 				if (Settings.display) {
 					gsGlobal->Mode = GS_MODE_PAL;
 					gsGlobal->Height = 512;
-					defaulty = 72;
 					snd_sample = SND_RATE / 50;
 					temp = strstr(options[i], "NTSC");
 					*temp = 0;
 					strcat(options[i], "PAL");
 				} else {
 					gsGlobal->Mode = GS_MODE_NTSC;
-					gsGlobal->Height = 448; //448;
-					defaulty = 40; // 50;
+					gsGlobal->Height = 448;
 					snd_sample = SND_RATE / 60;
 					temp = strstr(options[i], "PAL");
 					*temp = 0;
 					strcat(options[i], "NTSC");
 				}
-				
-				gsGlobal->StartY = defaulty + Settings.offset_y;
-				
-				if (Settings.interlace)
-					gsGlobal->StartY = gsGlobal->StartY + 22;
-				else
-					gsGlobal->StartY = gsGlobal->StartY + 11;
-				
-				normalize_screen();
-				
-				menu_x1 = gsGlobal->Width*0.25;
-				menu_y1 = gsGlobal->Height*0.25;
-				menu_x2 = gsGlobal->Width*0.75;
-				menu_y2 = gsGlobal->Height*0.75+FONT_HEIGHT;
+
+				init_custom_screen();
+
+				menu_x1 = gsGlobal->Width  * 0.25;
+				menu_y1 = gsGlobal->Height * 0.25;
+				menu_x2 = gsGlobal->Width  * 0.75;
+				menu_y2 = gsGlobal->Height * 0.75 + FONT_HEIGHT;
 				text_line = menu_y1 + 40;
 				option_changed = 1;
-				//SetGsCrt(gsGlobal->Interlace, gsGlobal->Mode, gsGlobal->Field);
-				gsKit_init_screen(gsGlobal);
-				gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 				break;
 			case 1: //Interlacing Off/On
 				Settings.interlace ^= 1;
 				if (Settings.interlace) {
 					gsGlobal->Interlace = GS_INTERLACED;
 					gsGlobal->Field = GS_FIELD;
-					gsGlobal->StartY = (gsGlobal->StartY-1)*2;
 					temp = strstr(options[i], "Off");
 					*temp = 0;
 					strcat(options[i], "On");
 				} else {
 					gsGlobal->Interlace = GS_NONINTERLACED;
 					gsGlobal->Field = GS_FRAME;
-					gsGlobal->StartY = gsGlobal->StartY/2 + 1;
 					temp = strstr(options[i], "On");
 					*temp = 0;
 					strcat(options[i], "Off");
 				}
-				normalize_screen();
+
+				init_custom_screen();
+
+				menu_x1 = gsGlobal->Width  * 0.25;
+				menu_y1 = gsGlobal->Height * 0.25;
+				menu_x2 = gsGlobal->Width  * 0.75;
+				menu_y2 = gsGlobal->Height * 0.75 + FONT_HEIGHT;
+				text_line = menu_y1 + 40;
 				option_changed = 1;
-				//SetGsCrt(gsGlobal->Interlace, gsGlobal->Mode, gsGlobal->Field);
-				gsKit_init_screen(gsGlobal);
-				gsKit_mode_switch(gsGlobal, GS_ONESHOT);
 				break;
 			case 2: //Center Screen
 				while (menu_input(0, 2) != 2) {

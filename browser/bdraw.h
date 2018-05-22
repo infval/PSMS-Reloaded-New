@@ -9,5 +9,6 @@ void browser_primitive(char *title1, char *title2, GSTEXTURE *gsTexture, float x
 void normalize_screen(void);
 void init_custom_screen(void);
 void SetupGSKit(void);
+void SetDisplayOffset(void);
 
 #endif /*DRAW_H_*/

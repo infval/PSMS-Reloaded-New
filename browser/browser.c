@@ -30,7 +30,6 @@ u8 bgtex = 1; // 1 = Disabled
 /************************************/
 
 extern GSGLOBAL *gsGlobal;
-//extern GSFONT *gsFont;
 
 /************************************/
 /* Pad Variables                    */
