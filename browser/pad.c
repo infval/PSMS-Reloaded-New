@@ -1,6 +1,6 @@
 #include <kernel.h>
 #include <stdio.h>
-#include "libpad.h"
+#include <libpad.h>
 
 static char padBuf[2][256] __attribute__((aligned(64)));
 

@@ -130,40 +130,36 @@ void Load_Global_CNF(char *CNF_path_p)
     for(var_cnt = 0; get_CNF_string(&CNF_p, &name, &value); var_cnt++) {
         // A variable was found, now we dispose of its value.
         printf("Found variable \"%s\" with value \"%s\"\r\n", name, value);
-        if(!strcmp(name,"OffsetX"))               { Settings.offset_x  = atoi(value); }
-        else if(!strcmp(name,"OffsetY"))          { Settings.offset_y  = atoi(value); }
-        else if(!strcmp(name,"Display"))          { Settings.display   = atoi(value); }
-        //else if(!strcmp(name,"Emulation"))        { Settings.emulation = atoi(value); }
-        else if(!strcmp(name,"Interlace"))        { Settings.interlace = atoi(value); }
-        else if(!strcmp(name,"Filter"))           { Settings.filter    = atoi(value); }
-        //else if(!strcmp(name,"LowPass"))          { Settings.lowpass   = atoi(value); }
-        //else if(!strcmp(name,"Turbo"))            { Settings.turbo     = atoi(value); }
+        if(!strcmp(name,"OffsetX"))               { Settings.offset_x         = atoi(value); }
+        else if(!strcmp(name,"OffsetY"))          { Settings.offset_y         = atoi(value); }
+        else if(!strcmp(name,"Display"))          { Settings.display          = atoi(value); }
+        else if(!strcmp(name,"Interlace"))        { Settings.interlace        = atoi(value); }
+        else if(!strcmp(name,"Filter"))           { Settings.filter           = atoi(value); }
+        else if(!strcmp(name,"SpriteLimit"))      { Settings.sprite_limit     = atoi(value); }
+        else if(!strcmp(name,"AutofirePattern"))  { Settings.autofire_pattern = atoi(value); }
         else if(!strcmp(name,"Elfpath"))          { strcpy(Settings.elfpath,value);   }
         else if(!strcmp(name,"Savepath"))         { strcpy(Settings.savepath,value);  }
         //else if(!strcmp(name,"Skinpath"))         { strcpy(Settings.skinpath,value);  }
         //Player 1 Settings
-//        else if(!strcmp(name,"JOY1_Menu"))        { Settings.PlayerInput[0][0]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_SaveState"))   { Settings.PlayerInput[0][1]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_LoadState"))   { Settings.PlayerInput[0][2]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_FDS_DiskSwap")){ Settings.PlayerInput[0][3]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_FDS_SideSwap")){ Settings.PlayerInput[0][4]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_A"))           { Settings.PlayerInput[0][5]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_B"))           { Settings.PlayerInput[0][6]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_Select"))      { Settings.PlayerInput[0][7]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_Start"))       { Settings.PlayerInput[0][8]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_Up"))          { Settings.PlayerInput[0][9]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_Down"))        { Settings.PlayerInput[0][10] = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_Left"))        { Settings.PlayerInput[0][11] = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY1_Right"))       { Settings.PlayerInput[0][12] = (u16)strtoul(value,NULL,16); }
-//        //Player 2 Settings
-//        else if(!strcmp(name,"JOY2_A"))           { Settings.PlayerInput[1][5]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY2_B"))           { Settings.PlayerInput[1][6]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY2_Select"))      { Settings.PlayerInput[1][7]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY2_Start"))       { Settings.PlayerInput[1][8]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY2_Up"))          { Settings.PlayerInput[1][9]  = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY2_Down"))        { Settings.PlayerInput[1][10] = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY2_Left"))        { Settings.PlayerInput[1][11] = (u16)strtoul(value,NULL,16); }
-//        else if(!strcmp(name,"JOY2_Right"))       { Settings.PlayerInput[1][12] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_Start"))       { Settings.PlayerInput[0][0] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_Up"))          { Settings.PlayerInput[0][1] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_Down"))        { Settings.PlayerInput[0][2] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_Left"))        { Settings.PlayerInput[0][3] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_Right"))       { Settings.PlayerInput[0][4] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_1"))           { Settings.PlayerInput[0][5] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_2"))           { Settings.PlayerInput[0][6] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_Turbo1"))      { Settings.PlayerInput[0][7] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_Turbo2"))      { Settings.PlayerInput[0][8] = (u16)strtoul(value,NULL,16); }
+        //Player 2 Settings
+        else if(!strcmp(name,"JOY2_Start"))       { Settings.PlayerInput[1][0] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY2_Up"))          { Settings.PlayerInput[1][1] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY2_Down"))        { Settings.PlayerInput[1][2] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY2_Left"))        { Settings.PlayerInput[1][3] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY2_Right"))       { Settings.PlayerInput[1][4] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY2_1"))           { Settings.PlayerInput[1][5] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY2_2"))           { Settings.PlayerInput[1][6] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY2_Turbo1"))      { Settings.PlayerInput[1][7] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY2_Turbo2"))      { Settings.PlayerInput[1][8] = (u16)strtoul(value,NULL,16); }
     }
 
     //Set so only first player controls emulator controls
@@ -429,75 +425,67 @@ void Save_Global_CNF(char *CNF_path_p)
         "# PSMS.CNF == Configuration file for the emulator PSMS        \r\n"
         "# CNF Handling Code (c)2006 Ronald Andersson aka dlanor       \r\n"
         "# ------------------------------------------------------------\r\n"
-        "OffsetX     = %d\r\n"
-        "OffsetY     = %d\r\n"
-        "Display     = %d\r\n"
-        //"Emulation   = %d\r\n"
-        "Interlace   = %d\r\n"
-        "Filter      = %d\r\n"
-        //"LowPass     = %d\r\n"
-        //"Turbo       = %d\r\n"
-        "Elfpath     = %s\r\n"
-        "Savepath    = %s\r\n"
+        "OffsetX         = %d\r\n"
+        "OffsetY         = %d\r\n"
+        "Display         = %d\r\n"
+        "Interlace       = %d\r\n"
+        "Filter          = %d\r\n"
+        "SpriteLimit     = %d\r\n"
+        "AutofirePattern = %d\r\n"
+        "Elfpath         = %s\r\n"
+        "Savepath        = %s\r\n"
         //"Skinpath    = %s\r\n"
-//        ";Player 1 Controls\r\n"
-//        "JOY1_Menu         = 0x%04x\r\n"
-//        "JOY1_SaveState    = 0x%04x\r\n"
-//        "JOY1_LoadState    = 0x%04x\r\n"
-//        "JOY1_FDS_DiskSwap = 0x%04x\r\n"
-//        "JOY1_FDS_SideSwap = 0x%04x\r\n"
-//        "JOY1_A            = 0x%04x\r\n"
-//        "JOY1_B            = 0x%04x\r\n"
-//        "JOY1_Select       = 0x%04x\r\n"
-//        "JOY1_Start        = 0x%04x\r\n"
-//        "JOY1_Up           = 0x%04x\r\n"
-//        "JOY1_Down         = 0x%04x\r\n"
-//        "JOY1_Left         = 0x%04x\r\n"
-//        "JOY1_Right        = 0x%04x\r\n"
-//        ";Player 2 Controls\r\n"
-//        "JOY2_A            = 0x%04x\r\n"
-//        "JOY2_B            = 0x%04x\r\n"
-//        "JOY2_Select       = 0x%04x\r\n"
-//        "JOY2_Start        = 0x%04x\r\n"
-//        "JOY2_Up           = 0x%04x\r\n"
-//        "JOY2_Down         = 0x%04x\r\n"
-//        "JOY2_Left         = 0x%04x\r\n"
-//        "JOY2_Right        = 0x%04x\r\n"
+        ";Player 1 Controls\r\n"
+        "JOY1_Start      = 0x%04x\r\n"
+        "JOY1_Up         = 0x%04x\r\n"
+        "JOY1_Down       = 0x%04x\r\n"
+        "JOY1_Left       = 0x%04x\r\n"
+        "JOY1_Right      = 0x%04x\r\n"
+        "JOY1_1          = 0x%04x\r\n"
+        "JOY1_2          = 0x%04x\r\n"
+        "JOY1_Turbo1     = 0x%04x\r\n"
+        "JOY1_Turbo2     = 0x%04x\r\n"
+        ";Player 2 Controls\r\n"
+        "JOY2_Start      = 0x%04x\r\n"
+        "JOY2_Up         = 0x%04x\r\n"
+        "JOY2_Down       = 0x%04x\r\n"
+        "JOY2_Left       = 0x%04x\r\n"
+        "JOY2_Right      = 0x%04x\r\n"
+        "JOY2_1          = 0x%04x\r\n"
+        "JOY2_2          = 0x%04x\r\n"
+        "JOY2_Turbo1     = 0x%04x\r\n"
+        "JOY2_Turbo2     = 0x%04x\r\n"
         "# ------------------------------------------------------------\r\n"
         "# End-Of-File for PSMS.CNF\r\n"
         "%n", //NB: The %n specifier causes NO output, but only a measurement
         Settings.offset_x,
         Settings.offset_y,
         Settings.display,
-//        Settings.emulation,
         Settings.interlace,
         Settings.filter,
-//        Settings.lowpass,
-//        Settings.turbo,
+        Settings.sprite_limit,
+        Settings.autofire_pattern,
         Settings.elfpath,
         Settings.savepath,
 //        Settings.skinpath,
-//        Settings.PlayerInput[0][0],
-//        Settings.PlayerInput[0][1],
-//        Settings.PlayerInput[0][2],
-//        Settings.PlayerInput[0][3],
-//        Settings.PlayerInput[0][4],
-//        Settings.PlayerInput[0][5],
-//        Settings.PlayerInput[0][6],
-//        Settings.PlayerInput[0][7],
-//        Settings.PlayerInput[0][8],
-//        Settings.PlayerInput[0][9],
-//        Settings.PlayerInput[0][10],
-//        Settings.PlayerInput[0][11],
-//        Settings.PlayerInput[0][12],
-//        Settings.PlayerInput[1][5],
-//        Settings.PlayerInput[1][6],
-//        Settings.PlayerInput[1][7],
-//        Settings.PlayerInput[1][8],
-//        Settings.PlayerInput[1][9],
-//        Settings.PlayerInput[1][10],
-//        Settings.PlayerInput[1][11],
-//        Settings.PlayerInput[1][12],
+       Settings.PlayerInput[0][0],
+       Settings.PlayerInput[0][1],
+       Settings.PlayerInput[0][2],
+       Settings.PlayerInput[0][3],
+       Settings.PlayerInput[0][4],
+       Settings.PlayerInput[0][5],
+       Settings.PlayerInput[0][6],
+       Settings.PlayerInput[0][7],
+       Settings.PlayerInput[0][8],
+       Settings.PlayerInput[1][0],
+       Settings.PlayerInput[1][1],
+       Settings.PlayerInput[1][2],
+       Settings.PlayerInput[1][3],
+       Settings.PlayerInput[1][4],
+       Settings.PlayerInput[1][5],
+       Settings.PlayerInput[1][6],
+       Settings.PlayerInput[1][7],
+       Settings.PlayerInput[1][8],
         &CNF_size);
 // Note that the final argument above measures accumulated string size,
 // used for fioWrite below, so it's not one of the config variables.
@@ -525,44 +513,29 @@ abort:
 
 void Default_Global_CNF(void)
 {
-    Settings.offset_x  = 0;
-    Settings.offset_y  = 0;
-    Settings.interlace = 0;
-    Settings.filter    = 0;
-    //Settings.lowpass   = 0;
-    //Settings.turbo     = 0;
-    Settings.display   = 0;
-    //Settings.emulation = 0;
+    Settings.offset_x         = 0;
+    Settings.offset_y         = 0;
+    Settings.display          = 0;
+    Settings.interlace        = 0;
+    Settings.filter           = 0;
+    Settings.sprite_limit     = 1;
+    Settings.autofire_pattern = 0; // 0 - 1-on, 1-off
     strcpy(Settings.elfpath, "mc0:/BOOT/BOOT.ELF");
     strcpy(Settings.savepath,"mc0:/PSMS/");
     //strcpy(Settings.skinpath,"");
-//    Settings.PlayerInput[0][0]  = PAD_TRIANGLE;
-//    Settings.PlayerInput[0][1]  = PAD_R2;
-//    Settings.PlayerInput[0][2]  = PAD_L2;
-//    Settings.PlayerInput[0][3]  = PAD_L3;
-//    Settings.PlayerInput[0][4]  = PAD_R3;
-//    Settings.PlayerInput[0][5]  = PAD_CROSS;
-//    Settings.PlayerInput[0][6]  = PAD_SQUARE;
-//    Settings.PlayerInput[0][7]  = PAD_SELECT;
-//    Settings.PlayerInput[0][8]  = PAD_START;
-//    Settings.PlayerInput[0][9]  = PAD_UP;
-//    Settings.PlayerInput[0][10] = PAD_DOWN;
-//    Settings.PlayerInput[0][11] = PAD_LEFT;
-//    Settings.PlayerInput[0][12] = PAD_RIGHT;
-//    Settings.PlayerInput[1][0]  = 0xFFFF;
-//    Settings.PlayerInput[1][1]  = 0xFFFF;
-//    Settings.PlayerInput[1][2]  = 0xFFFF;
-//    Settings.PlayerInput[1][3]  = 0xFFFF;
-//    Settings.PlayerInput[1][4]  = 0xFFFF;
-//    Settings.PlayerInput[1][5]  = PAD_CROSS;
-//    Settings.PlayerInput[1][6]  = PAD_SQUARE;
-//    Settings.PlayerInput[1][7]  = PAD_SELECT;
-//    Settings.PlayerInput[1][8]  = PAD_START;
-//    Settings.PlayerInput[1][9]  = PAD_UP;
-//    Settings.PlayerInput[1][10] = PAD_DOWN;
-//    Settings.PlayerInput[1][11] = PAD_LEFT;
-//    Settings.PlayerInput[1][12] = PAD_RIGHT;
 
+    int player;
+    for (player = 0; player < 2; player++) {
+        Settings.PlayerInput[player][0] = PAD_START;  // PAUSE/START
+        Settings.PlayerInput[player][1] = PAD_UP;     // UP
+        Settings.PlayerInput[player][2] = PAD_DOWN;   // DOWN
+        Settings.PlayerInput[player][3] = PAD_LEFT;   // LEFT
+        Settings.PlayerInput[player][4] = PAD_RIGHT;  // RIGHT
+        Settings.PlayerInput[player][5] = PAD_SQUARE; // BUTTON1
+        Settings.PlayerInput[player][6] = PAD_CROSS;  // BUTTON2
+        Settings.PlayerInput[player][7] = PAD_L1;     // Rapid BUTTON1
+        Settings.PlayerInput[player][8] = PAD_R1;     // Rapid BUTTON2
+    }
 }
 
 void Default_Skin_CNF(void)

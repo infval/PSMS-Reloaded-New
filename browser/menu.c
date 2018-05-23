@@ -223,15 +223,6 @@ int menu_input(int port, int center_screen) {
 	return change;
 }
 
-/** Browser Menu
- Display:         PAL/NTSC
- Emulated System: PAL/NTSC
- Center Screen
- Configure Save Path: (browse to path)
- Configure Elf Path: (browse to path)
- Exit to Elf Path
- Exit to PS2Browser
- **/
 int Browser_Menu(void) {
 	char cnfpath[2048];
 	int i, selection = 0;
@@ -461,17 +452,12 @@ int Browser_Menu(void) {
 	}
 }
 
-/** Ingame_Menu
- State number: 0
- Save State
- Load State
- Display Settings -> Center Screen
- Filtering (Bilinear/Nearest)
- Interlace Off (can be saved to config.cnf)
- Set Input "DisplayName" (pushing left or right here cycles though 0-9, which parses the control(number).cnf)
- Exit Game (Saves Sram)
- **/
 void setupSMSGS(void);
+
+static void Ingame_Menu_Controls();
+
+#define INGAME_MENU_N 10
+#define INGAME_MENU_EXIT_I 8
 
 void Ingame_Menu(void) {
 	int i, selection = 0;
@@ -486,23 +472,24 @@ void Ingame_Menu(void) {
 	int menu_x2 = gsGlobal->Width  * 0.75;
 	int menu_y2 = gsGlobal->Height * 0.75 + FONT_HEIGHT;
 
-	int text_line = menu_y1 + 40;
+	int text_line = menu_y1 + 4 + FONT_HEIGHT;
 
-	char options[9][23] = {
+	char options[INGAME_MENU_N][23] = {
 		{ "State number: " },
 		{ "Save State" },
 		{ "Load State" },
 		{ "Filtering: " },
 		{ "Sprite Limit: " },
+		{ "Configure Input >" },
 		{ "Region: " },
 		{ "Reset Game" },
 		{ "Exit Menu" },
 		{ "Exit Game" }
 	};
-	char options_state[9][32] = { { 0 } };
+	char options_state[INGAME_MENU_N][32] = { { 0 } };
 	char options_buffer[23+32] = { 0 };
 
-	for (i=0; i<9; i++) {
+	for (i=0; i<INGAME_MENU_N; i++) {
 		switch (i) {
 		case 0:
 			sprintf(options_state[i], "%d", statenum);
@@ -514,12 +501,12 @@ void Ingame_Menu(void) {
 				strcpy(options_state[i], "On");
 			break;
 		case 4:
-			if (vdp.limit)
+			if (Settings.sprite_limit)
 				strcpy(options_state[i], "On");
 			else
 				strcpy(options_state[i], "Off");
 			break;
-		case 5:
+		case 6:
 			if (sms.country == TYPE_OVERSEAS)
 				strcpy(options_state[i], "US/EUR");
 			else
@@ -535,12 +522,8 @@ void Ingame_Menu(void) {
 		selected = 0; //clear selected flag
 		selection += menu_input(0, 0);
 
-		if (selection >= 9) {
-			selection = 0;
-		}
-		if (selection < 0) {
-			selection = 8;
-		}
+		if (selection >= INGAME_MENU_N) { selection = 0; }
+		if (selection < 0) { selection = INGAME_MENU_N - 1; }
 
 		if (oldselect != selection || option_changed) {
 			i = 0x10000;
@@ -553,7 +536,7 @@ void Ingame_Menu(void) {
 			menu_primitive("Options", &MENU_TEX, menu_x1, menu_y1, menu_x2,
 					menu_y2);
 
-			for (i=0; i<9; i++) {
+			for (i=0; i<INGAME_MENU_N; i++) {
 				strcpy(options_buffer, options[i]);
 				strcat(options_buffer, options_state[i]);
 				if (selection == i) {
@@ -574,7 +557,7 @@ void Ingame_Menu(void) {
 
 		if (selected) {
 			if (selected == 2) { //menu combo pressed again
-				selection = 7;
+				selection = INGAME_MENU_EXIT_I;
 			}
 			i = selection;
 			switch (i) {
@@ -605,14 +588,18 @@ void Ingame_Menu(void) {
 				option_changed = 1;
 				break;
 			case 4:
-				vdp.limit ^= 1;
-				if (vdp.limit)
+				Settings.sprite_limit ^= 1;
+				if (Settings.sprite_limit)
 					strcpy(options_state[i], "On");
 				else
 					strcpy(options_state[i], "Off");
+				vdp.limit = Settings.sprite_limit;
 				option_changed = 1;
 				break;
 			case 5:
+				Ingame_Menu_Controls();
+				break;
+			case 6:
 				sms.country ^= 1;
 				if (sms.country == TYPE_OVERSEAS) {
 					strcpy(options_state[i], "US/EUR");
@@ -621,7 +608,7 @@ void Ingame_Menu(void) {
 				}
 				option_changed = 1;
 				break;
-			case 6:
+			case 7:
 				system_reset();
 				if(sound) {
 					SjPCM_Clearbuff();
@@ -629,10 +616,10 @@ void Ingame_Menu(void) {
 				}
 				setupSMSGS();
 				return;
-			case 7:
+			case 8:
 				setupSMSGS();
 				return;
-			case 8:
+			case 9:
 				statenum = 0;
 				endflag = 1;
 				selected = 0;
@@ -642,3 +629,227 @@ void Ingame_Menu(void) {
 	}
 }
 
+static int menu_input_controls(int port, int is_changing_button, u32 *new_button, int *left_right)
+{
+	int ret[2];
+	u32 paddata[2];
+	u32 new_pad[2];
+	u16 slot = 0;
+
+	int change = 0;
+	*left_right = 0;
+
+	// Check to see if pads are disconnected
+	ret[port] = padGetState(0, slot);
+	if ((ret[port] != PAD_STATE_STABLE) && (ret[port] != PAD_STATE_FINDCTP1)) {
+		if (ret[port] == PAD_STATE_DISCONN) {
+			printf("Pad(%d, %d) is disconnected\n", 0, slot);
+		}
+		ret[port] = padGetState(0, slot);
+	}
+	ret[port] = padRead(0, slot, &buttons[port]); // port, slot, buttons
+	if (ret[port] != 0) {
+		paddata[port]= 0xffff ^ buttons[port].btns;
+		new_pad[port] = paddata[port] & ~old_pad[port]; // Buttons pressed AND NOT buttons previously pressed
+		old_pad[port] = paddata[port];
+
+		if (new_pad[port]) {
+			if (is_changing_button) {
+				*new_button = new_pad[port];
+				selected = 1;
+			}
+			else {
+				if (new_pad[port] & PAD_UP) {
+					change = -1;
+				}
+				if (new_pad[port] & PAD_DOWN) {
+					change = 1;
+				}
+				if (new_pad[port] & PAD_LEFT) {
+					*left_right = -1;
+				}
+				if (new_pad[port] & PAD_RIGHT) {
+					*left_right = 1;
+				}
+				if (new_pad[port] & PAD_CROSS) {
+					selected = 1;
+				}
+				if (new_pad[port] == PAD_TRIANGLE) {
+					selected = 2;
+				}
+			}
+		}
+	}
+	return change;
+}
+
+static void padbuttonToStr(u16 button, char button_name[9])
+{
+	if (button == 0) {
+		strcpy(button_name, "---");
+		return;
+	}
+	int i;
+	for (i = 0; i < 16; i++) {
+		if (button & (1 << i)) {
+			break;
+		}
+	}
+	char *buttons[16] = {
+		"Select", "L3"   , "R3"  , "Start",
+		"Up       \xFF""=",
+		"Right    \xFF"":",
+		"Down     \xFF"";",
+		"Left     \xFF""<" ,
+		"L2"    , "R2"   , "L1"  , "R1"   ,
+		"Triangle \xFF""3",
+		"Circle   \xFF""0",
+		"Cross    \xFF""1",
+		"Square   \xFF""2"
+	};
+	strcpy(button_name, buttons[i]);
+}
+
+#define CONTROLS_N 12
+#define CONTROLS_BUTTON_N 9
+#define CONTROLS_OFFSET (CONTROLS_N - CONTROLS_BUTTON_N)
+
+static void Ingame_Menu_Controls()
+{
+	int i, b, selection = 0;
+	oldselect = -1;
+
+	int option_changed = 0;
+
+	int menu_x1 = gsGlobal->Width  * 0.25;
+	int menu_y1 = gsGlobal->Height * 0.25;
+	int menu_x2 = gsGlobal->Width  * 0.75;
+	int menu_y2 = gsGlobal->Height * 0.75 + FONT_HEIGHT;
+
+	int text_line = menu_y1 + 4 + FONT_HEIGHT;
+
+	char options[CONTROLS_N][32] = {
+		{ "< Back" },
+		{ "Autofire Pattern: "},
+		{ "Player: "},
+		{ "  Pause | " },
+		{ "     Up | " },
+		{ "   Down | " },
+		{ "   Left | " },
+		{ "  Right | " },
+		{ "Button1 | " },
+		{ "Button2 | " },
+		{ "Turbo 1 | " },
+		{ "Turbo 2 | " }
+	};
+	char options_state[CONTROLS_N][16] = { { 0 } };
+	char options_buffer[32+16] = { 0 };
+
+	int player = 0;
+	int is_changing_button = 0;
+	u32 new_button = 0;
+	int left_right = 0;
+
+	//sprintf(options_state[1], "1 on, %d off", Settings.autofire_pattern + 1);
+	sprintf(options_state[1], "%d on, %d off", (Settings.autofire_pattern>>3) + 1, (Settings.autofire_pattern&7) + 1);
+	strcpy(options_state[2], "1");
+	for (i = 0; i < CONTROLS_BUTTON_N; i++) {
+		padbuttonToStr(Settings.PlayerInput[player][i], options_state[i + CONTROLS_OFFSET]);
+	}
+
+	while (1) {
+		selected = 0; // Clear selected flag
+		selection += menu_input_controls(0, is_changing_button, &new_button, &left_right);
+
+		if (selection >= CONTROLS_N) { selection =  0; }
+		if (selection < 0) { selection = CONTROLS_N - 1; }
+
+		if (oldselect != selection || option_changed) {
+			i = 0x10000;
+			while (i--) asm("nop\nnop\nnop\nnop");
+			gsKit_queue_reset(gsGlobal->Os_Queue);
+
+			option_changed = 0;
+
+			menu_primitive("Controls", &MENU_TEX, menu_x1, menu_y1, menu_x2, menu_y2);
+
+			for (i = 0; i < CONTROLS_N; i++) {
+				strcpy(options_buffer, options[i]);
+				strcat(options_buffer, options_state[i]);
+				if (selection == i) {
+					printXY(options_buffer, menu_x1+10, text_line + i*FONT_HEIGHT, 4, FCEUSkin.highlight, 1, 0);
+				}
+				else {
+					printXY(options_buffer, menu_x1+10, text_line + i*FONT_HEIGHT, 4, FCEUSkin.textcolor, 1, 0);
+				}
+			}
+
+			DrawScreen(gsGlobal);
+		}
+
+		oldselect = selection;
+
+		if (selected || left_right) {
+			if (selected == 2) {
+				return;
+			}
+			i = selection;
+
+			if (i == 0) {
+				if (!left_right) {
+					return;
+				}
+			}
+			else if (i == 1) {
+				if (left_right >= 0) {
+					Settings.autofire_pattern++;
+				}
+				else {
+					Settings.autofire_pattern--;
+				}
+				if (Settings.autofire_pattern < 0) {
+					Settings.autofire_pattern = 64 - 1;
+				}
+				else if (Settings.autofire_pattern >= 64) {
+					Settings.autofire_pattern = 0;
+				}
+				sprintf(options_state[1], "%d on, %d off", (Settings.autofire_pattern>>3) + 1, (Settings.autofire_pattern&7) + 1);
+				option_changed = 1;
+			}
+			else if (i == 2) {
+				player++;
+				if (player >= 2) {
+					player = 0;
+				}
+				sprintf(options_state[i], "%d", player + 1);
+				for (b = 0; b < CONTROLS_BUTTON_N; b++) {
+					padbuttonToStr(Settings.PlayerInput[player][b], options_state[b + CONTROLS_OFFSET]);
+				}
+				option_changed = 1;
+			}
+			else {
+				if (!left_right) {
+					if (!is_changing_button) {
+						strcpy(options_state[i], "<Press Button>");
+					}
+					else {
+						i -= CONTROLS_OFFSET;
+
+						Settings.PlayerInput[player][i] = (u16)new_button;
+						// Resolve conflict
+						for (b = 0; b < CONTROLS_BUTTON_N; b++) {
+							if (b != i && Settings.PlayerInput[player][i] == Settings.PlayerInput[player][b]) {
+								Settings.PlayerInput[player][b] = 0;
+								padbuttonToStr(0, options_state[b + CONTROLS_OFFSET]);
+								break;
+							}
+						}
+						padbuttonToStr(Settings.PlayerInput[player][i], options_state[i + CONTROLS_OFFSET]);
+					}
+					is_changing_button ^= 1;
+					option_changed = 1;
+				}
+			}
+		}
+	}
+}

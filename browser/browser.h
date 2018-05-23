@@ -11,15 +11,14 @@ typedef struct {
     int offset_x;
     int offset_y;
     u8 display;
-    //u8 emulation;
     u8 interlace;
     u8 filter;
-    //u8 lowpass;
-    //u8 turbo;
+    u8 sprite_limit;
     char elfpath[1024];
     char savepath[1024];
     //char skinpath[1024];
-    //u16 PlayerInput[2][13];
+    u16 PlayerInput[2][9];
+    int autofire_pattern;
 } vars;
 
 typedef struct {

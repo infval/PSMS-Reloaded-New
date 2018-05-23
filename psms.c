@@ -38,7 +38,7 @@
 #include <iopheap.h>
 #include <loadfile.h>
 #include "shared.h"
-#include "libpad.h"
+#include <libpad.h>
 #include "psms.h"
 #include "sjpcm.h"
 #include "browser.h"
@@ -244,55 +244,55 @@ void setupSMSTexture(void) {
 
 void setupSMSGS(void)
 {
-    gsGlobal->DrawOrder = GS_OS_PER;
-    gsKit_mode_switch(gsGlobal, GS_PERSISTENT);
-    gsKit_queue_reset(gsGlobal->Per_Queue);
+	gsGlobal->DrawOrder = GS_OS_PER;
+	gsKit_mode_switch(gsGlobal, GS_PERSISTENT);
+	gsKit_queue_reset(gsGlobal->Per_Queue);
 
-    gsKit_clear(gsGlobal, GS_SETREG_RGBA(0x00,0x00,0x00,0x80));
+	gsKit_clear(gsGlobal, GS_SETREG_RGBA(0x00,0x00,0x00,0x80));
 
-    if(Settings.filter)
-    	SMSTEX.Filter = GS_FILTER_LINEAR;
-    else
-    	SMSTEX.Filter = GS_FILTER_NEAREST;
+	if(Settings.filter)
+		SMSTEX.Filter = GS_FILTER_LINEAR;
+	else
+		SMSTEX.Filter = GS_FILTER_NEAREST;
 
-    gsKit_prim_sprite_texture( gsGlobal, &SMSTEX,
-    					(cart.type == TYPE_SMS)?0.0f:15.0f, /* X1 */
-    					(cart.type == TYPE_SMS)?20.0f:20.0f, /* Y1 */
-    					(cart.type == TYPE_SMS)?0.0f:48.0f, /* U1 */
-    					(cart.type == TYPE_SMS)?0.0f:24.0f, /* V1 */
-                        gsGlobal->Width, /* X2 */ //stretch to screen width
-						gsGlobal->Height, /* Y2 */ //stretch to screen height
-						(cart.type == TYPE_SMS)?SMSTEX.Width:208, /* U2 */
-						(cart.type == TYPE_SMS)?192:173, //SMSTEX.Height, /* V2*/
-						2, /* Z */
-						GS_SETREG_RGBA(0x80,0x80,0x80,0x80) /* RGBA */
-						);
-//    gsKit_prim_sprite_texture( gsGlobal, &SMSTEX,
-//    					0.0f, /* X1 */
-//    					0.0f, /* Y1 */
-//    					0.0f, /* U1 */
-//    					0.0f, /* V1 */
-//                        gsGlobal->Width, /* X2 */ //stretch to screen width
-//						gsGlobal->Height, /* Y2 */ //stretch to screen height
-//						SMSTEX.Width, /* U2 */
-//						SMSTEX.Height, /* V2*/
-//						2, /* Z */
-//						GS_SETREG_RGBA(0x80,0x80,0x80,0x80) /* RGBA */
-//						);
+	gsKit_prim_sprite_texture(gsGlobal, &SMSTEX,
+		(cart.type == TYPE_SMS)? 0.0f:15.0f, /* X1 */
+		(cart.type == TYPE_SMS)?20.0f:20.0f, /* Y1 */
+		(cart.type == TYPE_SMS)? 0.0f:48.0f, /* U1 */
+		(cart.type == TYPE_SMS)? 0.0f:24.0f, /* V1 */
+		gsGlobal->Width,  /* X2 */ //stretch to screen width
+		gsGlobal->Height, /* Y2 */ //stretch to screen height
+		(cart.type == TYPE_SMS)?SMSTEX.Width:208,         /* U2 */
+		(cart.type == TYPE_SMS)?192:173, //SMSTEX.Height, /* V2 */
+		2, /* Z */
+		GS_SETREG_RGBA(0x80,0x80,0x80,0x80) /* RGBA */
+	);
+//	gsKit_prim_sprite_texture(gsGlobal, &SMSTEX,
+//		0.0f, /* X1 */
+//		0.0f, /* Y1 */
+//		0.0f, /* U1 */
+//		0.0f, /* V1 */
+//		gsGlobal->Width,  /* X2 */ //stretch to screen width
+//		gsGlobal->Height, /* Y2 */ //stretch to screen height
+//		SMSTEX.Width,     /* U2 */
+//		SMSTEX.Height,    /* V2 */
+//		2, /* Z */
+//		GS_SETREG_RGBA(0x80,0x80,0x80,0x80) /* RGBA */
+//	);
+	vdp.limit = Settings.sprite_limit;
 }
 
 void update_video()
 {
-
 	SMSTEX.Mem = (u32 *)bitmap_data;
 	
-    gsKit_texture_upload(gsGlobal, &SMSTEX);
+	gsKit_texture_upload(gsGlobal, &SMSTEX);
 
-    /* vsync and flip buffer */
-    gsKit_sync_flip(gsGlobal);
+	/* vsync and flip buffer */
+	gsKit_sync_flip(gsGlobal);
 
-    /* execute render queue */
-    gsKit_queue_exec(gsGlobal);
+	/* execute render queue */
+	gsKit_queue_exec(gsGlobal);
 }
 
 
@@ -304,6 +304,8 @@ void update_input()
 	static struct padButtonStatus pad2;
 	static int pad1_connected = 0, pad2_connected = 0;
 	static int p1_1t=0,p1_2t=0,p2_1t=0,p2_2t=0;
+	int  on = (Settings.autofire_pattern>>3) + 1;
+	int off = (Settings.autofire_pattern &7) + 1;
 	static u32 new_pad[2];
 	int pad1_data = 0;
 	int pad2_data = 0;
@@ -317,17 +319,31 @@ void update_input()
 		old_pad[0] = pad1_data;
 		//pad1_data = 0xffff ^ ((pad1.btns[0] << 8) | pad1.btns[1]);
 
-		if(pad1_data & PAD_L1) p1_1t ^= 1;
-		else p1_1t = 0;
-		if(pad1_data & PAD_R1) p1_2t ^= 1;
-		else p1_2t = 0;
-		if(pad1_data & PAD_LEFT)				input.pad[0] |= INPUT_LEFT;
-		if(pad1_data & PAD_RIGHT)				input.pad[0] |= INPUT_RIGHT;
-		if(pad1_data & PAD_UP)					input.pad[0] |= INPUT_UP;
-		if(pad1_data & PAD_DOWN)				input.pad[0] |= INPUT_DOWN;
-		if((pad1_data & PAD_CROSS)  || p1_2t)	input.pad[0] |= INPUT_BUTTON2;
-		if((pad1_data & PAD_SQUARE) || p1_1t)	input.pad[0] |= INPUT_BUTTON1;
-		if(pad1_data & PAD_START)				input.system |= (IS_GG) ? INPUT_START : INPUT_PAUSE;
+		if(pad1_data & Settings.PlayerInput[0][7]) {
+			if (p1_1t < on) {
+				input.pad[0] |= INPUT_BUTTON1;
+			}
+			p1_1t = (p1_1t + 1) % (on + off);
+		}
+		else {
+			p1_1t = 0;
+		}
+		if(pad1_data & Settings.PlayerInput[0][8]) {
+			if (p1_2t < on) {
+				input.pad[0] |= INPUT_BUTTON2;
+			}
+			p1_2t = (p1_2t + 1) % (on + off);
+		}
+		else {
+			p1_2t = 0;
+		}
+		if(pad1_data & Settings.PlayerInput[0][1]) input.pad[0] |= INPUT_UP;
+		if(pad1_data & Settings.PlayerInput[0][2]) input.pad[0] |= INPUT_DOWN;
+		if(pad1_data & Settings.PlayerInput[0][3]) input.pad[0] |= INPUT_LEFT;
+		if(pad1_data & Settings.PlayerInput[0][4]) input.pad[0] |= INPUT_RIGHT;
+		if(pad1_data & Settings.PlayerInput[0][5]) input.pad[0] |= INPUT_BUTTON1;
+		if(pad1_data & Settings.PlayerInput[0][6]) input.pad[0] |= INPUT_BUTTON2;
+		if(pad1_data & Settings.PlayerInput[0][0]) input.system |= (IS_GG) ? INPUT_START : INPUT_PAUSE;
 
 		if((pad1.mode >> 4) == 0x07) {
 			if(pad1.ljoy_h < 64) input.pad[0] |= INPUT_LEFT;
@@ -341,21 +357,35 @@ void update_input()
 	if(pad2_connected) {
 		padRead(1, 0, &pad2); // port, slot, buttons
 		pad2_data = 0xffff ^ pad2.btns;
-		new_pad[1] = pad1_data & ~old_pad[1];
+		new_pad[1] = pad2_data & ~old_pad[1];
 		old_pad[1] = pad2_data;
 		//pad2_data = 0xffff ^ ((pad2.btns[0] << 8) | pad2.btns[1]);
 
-		if(pad2_data & PAD_L1) p2_1t ^= 1;
-		else p2_1t = 0;
-		if(pad2_data & PAD_R1) p2_2t ^= 1;
-		else p2_2t = 0;
-		if(pad2_data & PAD_LEFT)				input.pad[1] |= INPUT_LEFT;
-		if(pad2_data & PAD_RIGHT)				input.pad[1] |= INPUT_RIGHT;
-		if(pad2_data & PAD_UP)					input.pad[1] |= INPUT_UP;
-		if(pad2_data & PAD_DOWN)				input.pad[1] |= INPUT_DOWN;
-		if((pad2_data & PAD_CROSS ) || p2_2t)	input.pad[1] |= INPUT_BUTTON2;
-		if((pad2_data & PAD_SQUARE) || p2_1t)	input.pad[1] |= INPUT_BUTTON1;
-//		if(pad2_data & PAD_START)	input.system |= (IS_GG) ? INPUT_START : INPUT_PAUSE;
+		if(pad2_data & Settings.PlayerInput[1][7]) {
+			if (p2_1t < on) {
+				input.pad[1] |= INPUT_BUTTON1;
+			}
+			p2_1t = (p2_1t + 1) % (on + off);
+		}
+		else {
+			p2_1t = 0;
+		}
+		if(pad2_data & Settings.PlayerInput[1][8]) {
+			if (p2_2t < on) {
+				input.pad[1] |= INPUT_BUTTON2;
+			}
+			p2_2t = (p2_2t + 1) % (on + off);
+		}
+		else {
+			p2_2t = 0;
+		}
+		if(pad2_data & Settings.PlayerInput[1][1]) input.pad[1] |= INPUT_UP;
+		if(pad2_data & Settings.PlayerInput[1][2]) input.pad[1] |= INPUT_DOWN;
+		if(pad2_data & Settings.PlayerInput[1][3]) input.pad[1] |= INPUT_LEFT;
+		if(pad2_data & Settings.PlayerInput[1][4]) input.pad[1] |= INPUT_RIGHT;
+		if(pad2_data & Settings.PlayerInput[1][5]) input.pad[1] |= INPUT_BUTTON1;
+		if(pad2_data & Settings.PlayerInput[1][6]) input.pad[1] |= INPUT_BUTTON2;
+//		if(pad2_data & Settings.PlayerInput[1][0]) input.system |= (IS_GG) ? INPUT_START : INPUT_PAUSE;
 
 		if((pad2.mode >> 4) == 0x07) {
 			if(pad2.ljoy_h < 64) input.pad[1] |= INPUT_LEFT;

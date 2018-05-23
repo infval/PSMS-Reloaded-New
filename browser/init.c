@@ -10,7 +10,7 @@
 #include <libmc.h>
 #include "cdvd_rpc.h"
 #include "cd.h"
-#include "libpad.h"
+#include <libpad.h>
 
 extern void poweroff_irx;
 extern int size_poweroff_irx;

@@ -649,7 +649,7 @@ char* Browser(int files_too, int menu_id, int filtered) {
 
 			gsKit_clear(gsGlobal, GS_SETREG_RGBAQ(0x00,0x00,0x00,0x80,0x00));
 
-			browser_primitive("PSMS Reloaded v0.5", "Browser", &BG_TEX,
+			browser_primitive("PSMS Reloaded New v0.6", "Browser", &BG_TEX,
 					menu_x1, menu_y1, menu_x2, menu_y2);
 
 			for (i=0; i<n; i++) { //display list
