@@ -33,7 +33,7 @@ void sms_frame(int skip_render)
 
     if(snd.log) snd.callback(0x00);
 
-    for(vdp.line = 0; vdp.line < 262; vdp.line += 1)
+    for(vdp.line = 0; vdp.line < LINES_PER_FRAME; vdp.line += 1)
     {
         /* Handle VDP line events */
         vdp_run();

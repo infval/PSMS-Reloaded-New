@@ -317,64 +317,88 @@ int listpfs(char *path, entries *FileEntry, int files_too) {
 	iox_dirent_t buf;
 	unsigned char filename[255];
 
-	if ((dd=fileXioDopen(path)) < 0) {
-		printf("Didn't open!\n");
-		return 0;
-	} else {
-		printf("Directory opened!\n");
-		//adds pseudo folder .. to every folder opened as mass: reported none but mc0: did
-		strcpy(FileEntry[0].filename, "..");
-		strcpy(FileEntry[0].displayname, "..");
-		FileEntry[0].dircheck = 1;
-		n=1;
-		while (fileXioDread(dd, &buf) > 0) {
-			if (buf.stat.mode & FIO_S_IFDIR && (!strcmp(buf.name, ".")
-					|| !strcmp(buf.name, "..")))
-				continue;
-			if (buf.stat.mode & FIO_S_IFDIR) {
-				FileEntry[n].dircheck = 1;
-				strcpy(FileEntry[n].filename, buf.name);
-				strzncpy(FileEntry[n].displayname, FileEntry[n].filename, 63);
-				n++;
-			}
+	if (!(strchr(path, '/'))) { //if path is not valid then load default device menu
+		strcpy(FileEntry[0].displayname, "mc0:");
+		strcpy(FileEntry[1].displayname, "mc1:");
+		strcpy(FileEntry[2].displayname, "mass:");
+		strcpy(FileEntry[3].displayname, "hdd0:");
+		strcpy(FileEntry[4].displayname, "cdfs:");
 
-			if (n >= FILEENTRY_SIZE - 2) {
-				break;
-			}
-		}
-		if (dd > 0) {
-			fileXioDclose(dd);
-			printf("Directory closed!\n");
-		}
-		qsort(FileEntry, n, sizeof(entries), comp_entries_by_filename);
-		if (files_too) {
-			first_file_index = n;
-			dd = 0;
-			dd = fileXioDopen(path);
+		strcpy(FileEntry[0].filename, "mc0:/");
+		strcpy(FileEntry[1].filename, "mc1:/");
+		strcpy(FileEntry[2].filename, "mass:/");
+		strcpy(FileEntry[3].filename, "hdd0:/");
+		strcpy(FileEntry[4].filename, "cdfs:/");
+
+		FileEntry[0].dircheck = 1;
+		FileEntry[1].dircheck = 1;
+		FileEntry[2].dircheck = 1;
+		FileEntry[3].dircheck = 1;
+		FileEntry[4].dircheck = 1;
+
+		n = 5;
+	} else if (!strncmp(path, "cdfs", 4)) {
+		n = listcdvd(path, FileEntry);
+	} else { 
+		if ((dd=fileXioDopen(path)) < 0) {
+			printf("Didn't open!\n");
+			return 0;
+		} else {
+			printf("Directory opened!\n");
+			//adds pseudo folder .. to every folder opened as mass: reported none but mc0: did
+			strcpy(FileEntry[0].filename, "..");
+			strcpy(FileEntry[0].displayname, "..");
+			FileEntry[0].dircheck = 1;
+			n=1;
 			while (fileXioDread(dd, &buf) > 0) {
-				strcpy(filename, buf.name);
-				
-				if(filter)
-					cond = (buf.stat.mode & FIO_S_IFREG) && ((strstr(strupr(filename), ".SMS") != NULL) || (strstr(strupr(filename), ".GG") != NULL));
-				else
-					cond = (buf.stat.mode & FIO_S_IFREG);
-				
-				if (cond) {
-					FileEntry[n].dircheck = 0;
+				if (buf.stat.mode & FIO_S_IFDIR && (!strcmp(buf.name, ".")
+						|| !strcmp(buf.name, "..")))
+					continue;
+				if (buf.stat.mode & FIO_S_IFDIR) {
+					FileEntry[n].dircheck = 1;
 					strcpy(FileEntry[n].filename, buf.name);
-					strzncpy(FileEntry[n].displayname, FileEntry[n].filename,
-							63);
+					strzncpy(FileEntry[n].displayname, FileEntry[n].filename, 63);
 					n++;
 				}
+
 				if (n >= FILEENTRY_SIZE - 2) {
 					break;
 				}
 			}
-			if (dd >= 0) {
+			if (dd > 0) {
 				fileXioDclose(dd);
 				printf("Directory closed!\n");
 			}
-			qsort(FileEntry + first_file_index, n - first_file_index, sizeof(entries), comp_entries_by_filename);
+			qsort(FileEntry, n, sizeof(entries), comp_entries_by_filename);
+			if (files_too) {
+				first_file_index = n;
+				dd = 0;
+				dd = fileXioDopen(path);
+				while (fileXioDread(dd, &buf) > 0) {
+					strcpy(filename, buf.name);
+					
+					if(filter)
+						cond = (buf.stat.mode & FIO_S_IFREG) && ((strstr(strupr(filename), ".SMS") != NULL) || (strstr(strupr(filename), ".GG") != NULL));
+					else
+						cond = (buf.stat.mode & FIO_S_IFREG);
+					
+					if (cond) {
+						FileEntry[n].dircheck = 0;
+						strcpy(FileEntry[n].filename, buf.name);
+						strzncpy(FileEntry[n].displayname, FileEntry[n].filename,
+								63);
+						n++;
+					}
+					if (n >= FILEENTRY_SIZE - 2) {
+						break;
+					}
+				}
+				if (dd >= 0) {
+					fileXioDclose(dd);
+					printf("Directory closed!\n");
+				}
+				qsort(FileEntry + first_file_index, n - first_file_index, sizeof(entries), comp_entries_by_filename);
+			}
 		}
 	}
 	return n;
@@ -410,10 +434,12 @@ int listpartitions(entries *FileEntry) {
 				continue;
 		}
 
-		if (!strncmp(hddEnt.name, "__", 2) && strcmp(hddEnt.name, "__boot")
-				&& strcmp(hddEnt.name, "__net") && strcmp(hddEnt.name,
-						"__system") && strcmp(hddEnt.name, "__sysconf") && strcmp(
-								hddEnt.name, "__common"))
+		if (!strncmp(hddEnt.name, "__", 2)
+		&& strcmp(hddEnt.name, "__boot")
+		&& strcmp(hddEnt.name, "__net")
+		&& strcmp(hddEnt.name, "__system")
+		&& strcmp(hddEnt.name, "__sysconf")
+		&& strcmp(hddEnt.name, "__common"))
 			continue;
 
 		strcpy(FileEntry[n].filename, hddEnt.name);
@@ -618,14 +644,19 @@ char* Browser(int files_too, int menu_id, int filtered) {
 					} else
 						n = 0;
 				}
-			} else if (!strncmp(path, "pfs", 3)) {
+			}
+			//else if (!strncmp(path, "pfs", 3)) {
+			//	n = listpfs(path, FileEntry, files_too);
+			//}
+			else {
 				n = listpfs(path, FileEntry, files_too);
-			} else
-				n = listdir(path, FileEntry, files_too); //n == max number of items + empty entry
+				//n = listdir(path, FileEntry, files_too); //n == max number of items + empty entry
+			}
 			if (n == 0) {
 				path[0] = 0;
 				strcpy(path, "path");
-				n = listdir(path, FileEntry, files_too);
+				n = listpfs(path, FileEntry, files_too);
+				//n = listdir(path, FileEntry, files_too);
 			}
 			strcpy(oldpath, path);//needed so listdir isn't called every loop
 			oldselect = -1; //so the screen draws on load
