@@ -25,9 +25,12 @@ EE_PACKED_BIN = psms-packed.elf
 
 #.SUFFIXES: .c .s .cc .dsm
 
-all: $(EE_BIN)
+all: create_irx $(EE_BIN)
 	$(EE_STRIP) $(EE_BIN)
 	ps2-packer $(EE_BIN) $(EE_PACKED_BIN)
+
+create_irx:
+	mkdir -p irx
 
 ./irx/iomanX_irx.c:
 	bin2c $(IRX_DIR)/iomanX.irx ./irx/iomanX_irx.c iomanX_irx
