@@ -32,7 +32,7 @@ extern int snd_sample;
 
 #define SND_RATE	48000
 
-int statenum=0;
+int statenum = 0;
 u8 power_off = 0;
 
 /************************************/
@@ -204,8 +204,8 @@ int menu_input(int port, int center_screen) {
 		if (new_pad[port] & PAD_CROSS) {
 			selected = 1;
 		}
-		if ((new_pad[port] == PAD_TRIANGLE) && !center_screen) {
-		//if ((new_pad[port] == Settings.PlayerInput[port][0]) && !center_screen) {
+		if ((new_pad[port] == PAD_TRIANGLE || (new_pad[port] == Settings.PlayerInput[port][9] && Settings.PlayerInput[port][9] != PAD_CROSS))
+			&& !center_screen) {
 			selected = 2;
 		}
 	}
@@ -710,9 +710,10 @@ static void padbuttonToStr(u16 button, char button_name[9])
 	strcpy(button_name, buttons[i]);
 }
 
-#define CONTROLS_N 12
-#define CONTROLS_BUTTON_N 9
+#define CONTROLS_N 13
+#define CONTROLS_BUTTON_N 10
 #define CONTROLS_OFFSET (CONTROLS_N - CONTROLS_BUTTON_N)
+#define CONTROLS_MENU_BUTTON_I 9
 
 static void Ingame_Menu_Controls()
 {
@@ -740,7 +741,8 @@ static void Ingame_Menu_Controls()
 		{ "Button1 | " },
 		{ "Button2 | " },
 		{ "Turbo 1 | " },
-		{ "Turbo 2 | " }
+		{ "Turbo 2 | " },
+		{ "   Menu | " }
 	};
 	char options_state[CONTROLS_N][16] = { { 0 } };
 	char options_buffer[32+16] = { 0 };
@@ -842,6 +844,20 @@ static void Ingame_Menu_Controls()
 								Settings.PlayerInput[player][b] = 0;
 								padbuttonToStr(0, options_state[b + CONTROLS_OFFSET]);
 								break;
+							}
+						}
+						// Menu
+						if (Settings.PlayerInput[player][CONTROLS_MENU_BUTTON_I] == 0) {
+							u16 used_buttons = 0;
+							for (b = 0; b < CONTROLS_BUTTON_N; b++) {
+								used_buttons |= Settings.PlayerInput[player][b];
+							}
+							for (b = 0; b < 16; b++) {
+								if (!(used_buttons & (1 << b))) {
+									Settings.PlayerInput[player][CONTROLS_MENU_BUTTON_I] = 1 << b;
+									padbuttonToStr(Settings.PlayerInput[player][CONTROLS_MENU_BUTTON_I], options_state[CONTROLS_MENU_BUTTON_I + CONTROLS_OFFSET]);
+									break;
+								}
 							}
 						}
 						padbuttonToStr(Settings.PlayerInput[player][i], options_state[i + CONTROLS_OFFSET]);

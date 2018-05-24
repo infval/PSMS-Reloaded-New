@@ -17,7 +17,7 @@ typedef struct {
     char elfpath[1024];
     char savepath[1024];
     //char skinpath[1024];
-    u16 PlayerInput[2][9];
+    u16 PlayerInput[2][10];
     int autofire_pattern;
 } vars;
 

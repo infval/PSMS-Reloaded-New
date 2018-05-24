@@ -150,6 +150,7 @@ void Load_Global_CNF(char *CNF_path_p)
         else if(!strcmp(name,"JOY1_2"))           { Settings.PlayerInput[0][6] = (u16)strtoul(value,NULL,16); }
         else if(!strcmp(name,"JOY1_Turbo1"))      { Settings.PlayerInput[0][7] = (u16)strtoul(value,NULL,16); }
         else if(!strcmp(name,"JOY1_Turbo2"))      { Settings.PlayerInput[0][8] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY1_Menu"))        { Settings.PlayerInput[0][9] = (u16)strtoul(value,NULL,16); }
         //Player 2 Settings
         else if(!strcmp(name,"JOY2_Start"))       { Settings.PlayerInput[1][0] = (u16)strtoul(value,NULL,16); }
         else if(!strcmp(name,"JOY2_Up"))          { Settings.PlayerInput[1][1] = (u16)strtoul(value,NULL,16); }
@@ -160,6 +161,7 @@ void Load_Global_CNF(char *CNF_path_p)
         else if(!strcmp(name,"JOY2_2"))           { Settings.PlayerInput[1][6] = (u16)strtoul(value,NULL,16); }
         else if(!strcmp(name,"JOY2_Turbo1"))      { Settings.PlayerInput[1][7] = (u16)strtoul(value,NULL,16); }
         else if(!strcmp(name,"JOY2_Turbo2"))      { Settings.PlayerInput[1][8] = (u16)strtoul(value,NULL,16); }
+        else if(!strcmp(name,"JOY2_Menu"))        { Settings.PlayerInput[1][9] = (u16)strtoul(value,NULL,16); }
     }
 
     //Set so only first player controls emulator controls
@@ -445,6 +447,7 @@ void Save_Global_CNF(char *CNF_path_p)
         "JOY1_2          = 0x%04x\r\n"
         "JOY1_Turbo1     = 0x%04x\r\n"
         "JOY1_Turbo2     = 0x%04x\r\n"
+        "JOY1_Menu       = 0x%04x\r\n"
         ";Player 2 Controls\r\n"
         "JOY2_Start      = 0x%04x\r\n"
         "JOY2_Up         = 0x%04x\r\n"
@@ -455,6 +458,7 @@ void Save_Global_CNF(char *CNF_path_p)
         "JOY2_2          = 0x%04x\r\n"
         "JOY2_Turbo1     = 0x%04x\r\n"
         "JOY2_Turbo2     = 0x%04x\r\n"
+        "JOY2_Menu       = 0x%04x\r\n"
         "# ------------------------------------------------------------\r\n"
         "# End-Of-File for PSMS.CNF\r\n"
         "%n", //NB: The %n specifier causes NO output, but only a measurement
@@ -477,6 +481,7 @@ void Save_Global_CNF(char *CNF_path_p)
        Settings.PlayerInput[0][6],
        Settings.PlayerInput[0][7],
        Settings.PlayerInput[0][8],
+       Settings.PlayerInput[0][9],
        Settings.PlayerInput[1][0],
        Settings.PlayerInput[1][1],
        Settings.PlayerInput[1][2],
@@ -486,6 +491,7 @@ void Save_Global_CNF(char *CNF_path_p)
        Settings.PlayerInput[1][6],
        Settings.PlayerInput[1][7],
        Settings.PlayerInput[1][8],
+       Settings.PlayerInput[1][9],
         &CNF_size);
 // Note that the final argument above measures accumulated string size,
 // used for fioWrite below, so it's not one of the config variables.
@@ -526,15 +532,16 @@ void Default_Global_CNF(void)
 
     int player;
     for (player = 0; player < 2; player++) {
-        Settings.PlayerInput[player][0] = PAD_START;  // PAUSE/START
-        Settings.PlayerInput[player][1] = PAD_UP;     // UP
-        Settings.PlayerInput[player][2] = PAD_DOWN;   // DOWN
-        Settings.PlayerInput[player][3] = PAD_LEFT;   // LEFT
-        Settings.PlayerInput[player][4] = PAD_RIGHT;  // RIGHT
-        Settings.PlayerInput[player][5] = PAD_SQUARE; // BUTTON1
-        Settings.PlayerInput[player][6] = PAD_CROSS;  // BUTTON2
-        Settings.PlayerInput[player][7] = PAD_L1;     // Rapid BUTTON1
-        Settings.PlayerInput[player][8] = PAD_R1;     // Rapid BUTTON2
+        Settings.PlayerInput[player][0] = PAD_START;    // PAUSE/START
+        Settings.PlayerInput[player][1] = PAD_UP;       // UP
+        Settings.PlayerInput[player][2] = PAD_DOWN;     // DOWN
+        Settings.PlayerInput[player][3] = PAD_LEFT;     // LEFT
+        Settings.PlayerInput[player][4] = PAD_RIGHT;    // RIGHT
+        Settings.PlayerInput[player][5] = PAD_SQUARE;   // BUTTON1
+        Settings.PlayerInput[player][6] = PAD_CROSS;    // BUTTON2
+        Settings.PlayerInput[player][7] = PAD_TRIANGLE; // Rapid BUTTON1
+        Settings.PlayerInput[player][8] = PAD_CIRCLE;   // Rapid BUTTON2
+        Settings.PlayerInput[player][9] = PAD_L1;       // Menu
     }
 }
 

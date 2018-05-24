@@ -411,7 +411,7 @@ void update_input()
 		pad2_connected = 1;
 	} else pad2_connected = 0;
 
-	if((new_pad[0] & PAD_TRIANGLE)) {
+	if((new_pad[0] & Settings.PlayerInput[0][9])) {
 		if(sound) SjPCM_Pause();
 		Ingame_Menu();
 		if(sound) SjPCM_Play();
