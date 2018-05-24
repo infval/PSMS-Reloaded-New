@@ -228,8 +228,8 @@ int cpu_readport(int port)
             if(input.pad[0] & INPUT_DOWN)    temp &= ~0x02;
             if(input.pad[0] & INPUT_LEFT)    temp &= ~0x04;
             if(input.pad[0] & INPUT_RIGHT)   temp &= ~0x08;
-            if(input.pad[0] & INPUT_BUTTON2) temp &= ~0x10;
-            if(input.pad[0] & INPUT_BUTTON1) temp &= ~0x20;
+            if(input.pad[0] & INPUT_BUTTON1) temp &= ~0x10;
+            if(input.pad[0] & INPUT_BUTTON2) temp &= ~0x20;
             if(input.pad[1] & INPUT_UP)      temp &= ~0x40;
             if(input.pad[1] & INPUT_DOWN)    temp &= ~0x80;
             return (temp);
@@ -239,8 +239,8 @@ int cpu_readport(int port)
             temp = 0xFF;
             if(input.pad[1] & INPUT_LEFT)    temp &= ~0x01;
             if(input.pad[1] & INPUT_RIGHT)   temp &= ~0x02;
-            if(input.pad[1] & INPUT_BUTTON2) temp &= ~0x04;
-            if(input.pad[1] & INPUT_BUTTON1) temp &= ~0x08;
+            if(input.pad[1] & INPUT_BUTTON1) temp &= ~0x04;
+            if(input.pad[1] & INPUT_BUTTON2) temp &= ~0x08;
             if(input.system & INPUT_SOFT_RESET) temp &= ~0x10;
             return ((temp & 0x3F) | (sms.port_3F & 0xC0));
 

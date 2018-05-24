@@ -26,8 +26,8 @@
 #define INPUT_DOWN        (0x00000002)
 #define INPUT_LEFT        (0x00000004)
 #define INPUT_RIGHT       (0x00000008)
-#define INPUT_BUTTON2     (0x00000010)
-#define INPUT_BUTTON1     (0x00000020)
+#define INPUT_BUTTON1     (0x00000010)
+#define INPUT_BUTTON2     (0x00000020)
 
 /* These can be used for 'input.system' */
 #define INPUT_START       (0x00000001)    /* Game Gear only */    
